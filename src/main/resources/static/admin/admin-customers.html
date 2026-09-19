@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers | EverGreen Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="d-flex">
+        <!-- Reusable Sidebar -->
+        <div class="glass-sidebar-left p-4" style="width: 280px; height: 100vh; border-right: 1px solid rgba(255,255,255,0.1);">
+            <div class="mb-5">
+                <span class="logo-text">Ever<span class="text-accent">Green</span></span>
+                <p class="tagline">Admin Suite</p>
+            </div>
+            <nav class="nav flex-column gap-2">
+                <a href="admin-dashboard.html" class="nav-link-glass"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a href="admin-inventory.html" class="nav-link-glass"><i class="bi bi-box-seam"></i> Inventory</a>
+                <a href="admin-products.html" class="nav-link-glass"><i class="bi bi-journal-plus"></i> Manage Products</a>
+                <a href="admin-orders.html" class="nav-link-glass"><i class="bi bi-cart-check"></i> Orders</a>
+                <a href="admin-customers.html" class="nav-link-glass active"><i class="bi bi-people"></i> Customers</a>
+                <a href="admin-logistics.html" class="nav-link-glass"><i class="bi bi-truck"></i> Logistics</a>
+                <a href="admin-payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payments</a>
+                <a href="../login.html" class="nav-link-glass text-danger mt-5"><i class="bi bi-box-arrow-left"></i> Logout</a>
+            </nav>
+        </div>
+
+        <main class="flex-grow-1 p-5">
+            <!-- Research Integration Header -->
+            <!-- Sustainability Integration Header -->
+<header class="mb-5">
+    <div class="d-flex justify-content-between align-items-end">
+        <div>
+            <h2 class="section-headline">Customer Intelligence</h2>
+            <p class="section-subheadline">Monitoring lifetime value and environmental impact metrics</p>
+        </div>
+        <div class="glass-card py-2 px-3 d-flex align-items-center gap-3">
+            <i class="bi bi-tree text-accent"></i>
+            <span class="x-small">Total Carbon Offset: <strong>142.8 kg CO2e</strong></span>
+        </div>
+    </div>
+</header>
+
+<!-- Customer Table with Sustainability Metric -->
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="table table-dark align-middle">
+            <thead>
+                <tr class="opacity-50 x-small text-uppercase">
+                    <th>User Profile</th>
+                    <th>Membership</th>
+                    <th>Total Spend</th>
+                    <th>Eco-Impact Score</th> <!-- New Requirement Alignment -->
+                    <th>Order Frequency</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="customersTableBody">
+                <!-- Dynamically Loaded -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        // Client-side Guard: Only allow logged-in Admins to access this panel
+        const userJson = localStorage.getItem('loggedInUser');
+        if (!userJson) {
+            alert("Access Denied! Please sign in first.");
+            window.location.href = '../login.html';
+        } else {
+            const user = JSON.parse(userJson);
+            if (user.role !== 'ADMIN') {
+                alert("Access Denied! You do not have administrator privileges.");
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Dynamic Customers Loading
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCustomers();
+        });
+
+        function loadCustomers() {
+            const tbody = document.getElementById("customersTableBody");
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4"><span class="spinner-border spinner-border-sm text-accent me-2"></span>Loading customers...</td></tr>`;
+
+            fetch("/api/admin/customers")
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load customers");
+                    return res.json();
+                })
+                .then(customers => {
+                    tbody.innerHTML = "";
+                    if (customers.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 opacity-50">No shoppers registered in the database.</td></tr>`;
+                        return;
+                    }
+
+                    customers.forEach(c => {
+                        const isPremium = c.totalSpent > 5000;
+                        const membershipLabel = isPremium ? 'EverGreen+' : 'Standard';
+                        const membershipClass = isPremium ? 'bg-accent text-dark' : 'border border-white-10 text-white';
+
+                        const ecoScore = Math.min(100, Math.round((c.totalSpent / 200) + 10));
+
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="profile-avatar-sm bg-accent rounded-circle d-flex align-items-center justify-content-center fw-bold text-dark" style="width: 35px; height: 35px; font-size: 0.85rem;">
+                                        ${c.name ? c.name.charAt(0).toUpperCase() : 'U'}
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">${escapeHtml(c.name)}</div>
+                                        <div class="x-small opacity-50">${escapeHtml(c.email)}</div>
+                                        <div class="x-small opacity-50">${escapeHtml(c.phone || 'No phone')}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge ${membershipClass}">${membershipLabel}</span></td>
+                            <td><span class="product-price" style="font-size: 0.95rem;"><span class="currency">Rs.</span> ${c.totalSpent.toFixed(2)}</span></td>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="text-accent">${ecoScore}/100</span>
+                                    <div class="progress w-100" style="height: 4px; width: 60px !important;">
+                                        <div class="progress-bar bg-accent" style="width: ${ecoScore}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${c.totalOrders} Orders</td>
+                            <td>
+                                <a href="admin-orders.html" class="btn-add-cart py-1 px-2 d-inline-block text-center" style="line-height: normal;"><i class="bi bi-eye"></i></a>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error loading customers:", err);
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error loading customers: ${err.message}</td></tr>`;
+                });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>

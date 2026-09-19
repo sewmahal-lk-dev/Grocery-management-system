@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | Secure Checkout</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Stripe JS SDK -->
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+
+<body class="bg-black text-white">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg border-bottom border-white-10">
+        <div class="container">
+            <a class="navbar-brand d-flex flex-column" href="index.html">
+                <span class="logo-text">Ever<span class="text-accent">Green</span></span>
+            </a>
+            <div class="small text-white-50"><i class="bi bi-lock-fill me-1"></i> Secure Checkout</div>
+        </div>
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row g-5">
+            <!-- Left Column: Shipping & Payment -->
+            <div class="col-lg-7">
+
+                <!-- Section 1: Delivery Address -->
+                <div class="checkout-section mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">1. Delivery Address</h5>
+                        <a id="address-action-link" href="javascript:void(0)" onclick="openAddressSelector()"
+                            class="small text-accent text-decoration-none">Change</a>
+                    </div>
+                    <div id="selected-address-card" class="glass-card p-4 border-accent">
+                        <!-- Content Injected -->
+                    </div>
+                </div>
+
+                <!-- Section 2: Payment Method -->
+                <div class="checkout-section mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0">2. Payment Method</h5>
+                    </div>
+                    <div id="stripe-payment-container" class="glass-card p-4 border-white-10">
+                        <div class="d-flex align-items-center gap-3 mb-4">
+                            <i class="bi bi-credit-card text-accent fs-4"></i>
+                            <h6 class="mb-0">Credit or Debit Card</h6>
+                        </div>
+
+                        <!-- Stripe Card Element Mount Point -->
+                        <div id="card-element" class="form-control glass-input py-3">
+                            <!-- A Stripe Element will be inserted here. -->
+                        </div>
+
+                        <!-- Used to display form errors. -->
+                        <div id="card-errors" role="alert" class="text-danger small mt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Delivery Preference -->
+                <div class="checkout-section">
+                    <h5 class="fw-bold mb-4">3. Delivery Schedule</h5>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div id="delivery-card-standard" class="glass-card p-3 border-accent text-center cursor-pointer active-selection" onclick="selectDeliveryType('STANDARD')">
+                                <p class="small fw-bold mb-1">Standard</p>
+                                <p class="x-small text-white-50 mb-0">Today, 5 PM - 8 PM</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="delivery-card-schedule" class="glass-card p-3 border-white-10 text-center cursor-pointer opacity-50" onclick="selectDeliveryType('SCHEDULED')">
+                                <p class="small fw-bold mb-1">Schedule</p>
+                                <p class="x-small text-white-50 mb-0">Select Date & Time</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Date & Time Picker (expands when scheduled) -->
+                    <div id="schedule-picker-container" class="mt-4 p-4 glass-card border-white-10 rounded-3" style="display: none;">
+                        <label class="small text-white-50 mb-3 d-block"><i class="bi bi-calendar-event text-accent me-2"></i>Select Delivery Date</label>
+                        <div class="d-flex gap-2 overflow-x-auto pb-3" id="date-selector-strip" style="scrollbar-width: thin;">
+                            <!-- Dynamically generated next 5 days -->
+                        </div>
+                        
+                        <label class="small text-white-50 mt-4 mb-3 d-block"><i class="bi bi-clock text-accent me-2"></i>Select Delivery Time Slot</label>
+                        <div class="row g-2" id="time-slot-selector">
+                            <div class="col-4">
+                                <button type="button" class="btn btn-outline-light w-100 py-2 small select-slot-btn active-slot" onclick="selectTimeSlot('09:00 AM - 12:00 PM', this)">
+                                    <span class="d-block fw-bold small">Morning</span>
+                                    <span class="x-small text-white-50">9 AM - 12 PM</span>
+                                </button>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-outline-light w-100 py-2 small select-slot-btn" onclick="selectTimeSlot('01:00 PM - 04:00 PM', this)">
+                                    <span class="d-block fw-bold small">Afternoon</span>
+                                    <span class="x-small text-white-50">1 PM - 4 PM</span>
+                                </button>
+                            </div>
+                            <div class="col-4">
+                                <button type="button" class="btn btn-outline-light w-100 py-2 small select-slot-btn" onclick="selectTimeSlot('05:00 PM - 08:00 PM', this)">
+                                    <span class="d-block fw-bold small">Evening</span>
+                                    <span class="x-small text-white-50">5 PM - 8 PM</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Order Summary -->
+            <div class="col-lg-5">
+                <div class="glass-card p-4 sticky-top" style="top: 100px;">
+                    <h5 class="fw-bold mb-4">Order Summary</h5>
+
+                    <!-- Simplified Item List -->
+                    <div class="summary-items mb-4" id="checkout-items-list">
+                        <!-- Cart items will be injected here -->
+                    </div>
+
+                    <hr class="border-white-10 mb-4">
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-white-50">Subtotal</span>
+                        <span id="checkout-subtotal">Rs. 0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-white-50">Delivery Fee</span>
+                        <span>Rs. 250.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-4">
+                        <h6 class="fw-bold">Total</h6>
+                        <h6 id="checkout-total" class="fw-bold text-accent">Rs. 0.00</h6>
+                    </div>
+
+                    <button class="btn btn-glass-pill w-100 py-3 fw-bold mb-3" onclick="placeOrder()">
+                        Place Order
+                    </button>
+
+                    <p class="x-small text-center text-white-50">
+                        By placing your order, you agree to EverGreen's
+                        <a href="#" class="text-accent text-decoration-none">Terms of Service</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card border-0 text-center p-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle text-accent" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="fw-bold">Order Placed!</h4>
+                <p class="text-white-50 mb-4">Your fresh groceries are on their way!</p>
+                <a href="javascript:void(0)" id="downloadPdfBtn" class="btn btn-glass-pill mb-2 w-100 py-2" style="display: none;">
+                    <i class="bi bi-download me-2"></i>Download PDF Invoice
+                </a>
+                <a href="index.html" class="btn btn-outline-light rounded-pill w-100 py-2">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Selection Modal -->
+    <div class="modal fade" id="addressSelectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content glass-card border-0">
+                <div class="modal-header border-bottom border-white-10 p-4">
+                    <h5 class="modal-title fw-bold">Select Delivery Address</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="address-selection-list" class="d-flex flex-column gap-3">
+                        <!-- Addresses injected here -->
+                    </div>
+                    <div class="mt-4 pt-3 border-top border-white-10 text-center">
+                        <a href="javascript:void(0)" onclick="openAddModal()"
+                            class="small text-accent text-decoration-none">+ Add New Address</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Selection Modal -->
+    <div class="modal fade" id="paymentSelectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content glass-card border-0">
+                <div class="modal-header border-bottom border-white-10 p-4">
+                    <h5 class="modal-title fw-bold">Select Payment Method</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="payment-selection-list" class="d-flex flex-column gap-3">
+                        <!-- Payments injected here -->
+                    </div>
+                    <div class="mt-4 pt-3 border-top border-white-10 text-center">
+                        <a href="payments.html" class="small text-accent text-decoration-none">+ Manage Cards</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Address Entry Modal (New) -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card border-0">
+                <div class="modal-header border-bottom border-white-10 p-4">
+                    <h5 class="modal-title fw-bold" id="modalTitle">New Delivery Address</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="addressForm">
+                        <input type="hidden" id="addressId">
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Address Label</label>
+                            <input type="text" id="addressLabel" class="form-control glass-input"
+                                placeholder="e.g. Home, Office" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Full Name</label>
+                            <input type="text" id="fullName" class="form-control glass-input"
+                                placeholder="Receiver's Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Street Address</label>
+                            <textarea id="streetAddress" class="form-control glass-input" rows="2"
+                                placeholder="House No, Street Name, City" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Phone Number</label>
+                            <input type="text" id="phone" class="form-control glass-input" placeholder="+94 ..."
+                                required>
+                        </div>
+                        <button type="submit" id="saveAddressBtn" class="btn btn-glass-pill w-100 mt-3 py-2">
+                            Save Address
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ==========================================
+        // 1. COMMON / GLOBAL LOGIC
+        // ==========================================
+        let currentUser = null;
+        let allAddresses = [];
+        let allPayments = [];
+        let selectedAddress = null;
+        let selectedPayment = null;
+        let addressEntryModal = null;
+
+        // Delivery Schedule State
+        let deliveryType = 'STANDARD';
+        let scheduledDate = null;
+        let scheduledSlot = '09:00 AM - 12:00 PM';
+
+        function selectDeliveryType(type) {
+            deliveryType = type;
+            const standardCard = document.getElementById('delivery-card-standard');
+            const scheduleCard = document.getElementById('delivery-card-schedule');
+            const pickerContainer = document.getElementById('schedule-picker-container');
+
+            if (type === 'STANDARD') {
+                standardCard.classList.add('active-selection');
+                standardCard.classList.remove('opacity-50');
+                scheduleCard.classList.remove('active-selection');
+                scheduleCard.classList.add('opacity-50');
+                pickerContainer.style.display = 'none';
+            } else {
+                scheduleCard.classList.add('active-selection');
+                scheduleCard.classList.remove('opacity-50');
+                standardCard.classList.remove('active-selection');
+                standardCard.classList.add('opacity-50');
+                pickerContainer.style.display = 'block';
+                
+                // Auto-generate dates if not already generated
+                if (!scheduledDate) {
+                    generateDates();
+                }
+            }
+        }
+
+        function generateDates() {
+            const strip = document.getElementById('date-selector-strip');
+            strip.innerHTML = '';
+            
+            // Generate next 5 days starting tomorrow
+            for (let i = 1; i <= 5; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() + i);
+                
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                const dayNum = date.getDate();
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const dayStr = String(dayNum).padStart(2, '0');
+                const isoDate = `${year}-${month}-${dayStr}`;
+
+                const isFirst = i === 1;
+                if (isFirst) {
+                    scheduledDate = isoDate;
+                }
+
+                strip.innerHTML += `
+                    <div class="glass-card p-2 date-pill cursor-pointer ${isFirst ? 'active' : ''}" onclick="selectDate('${isoDate}', this)">
+                        <span class="d-block x-small text-white-50">${dayName}</span>
+                        <span class="d-block fw-bold fs-5">${dayNum}</span>
+                    </div>
+                `;
+            }
+        }
+
+        function selectDate(dateStr, element) {
+            scheduledDate = dateStr;
+            document.querySelectorAll('.date-pill').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function selectTimeSlot(slot, element) {
+            scheduledSlot = slot;
+            document.querySelectorAll('.select-slot-btn').forEach(btn => btn.classList.remove('active-slot'));
+            element.classList.add('active-slot');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userJson = localStorage.getItem('loggedInUser');
+            if (userJson) {
+                currentUser = JSON.parse(userJson);
+                fetchCheckoutData();
+            } else {
+                window.location.href = 'login.html';
+            }
+
+            // Initialize Modals & Forms
+            addressEntryModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+            setupAddressForm();
+        });
+
+        async function fetchCheckoutData() {
+            if (!currentUser) return;
+
+            try {
+                // Fetch Core Data
+                const [summaryRes, addrRes] = await Promise.all([
+                    fetch(`/api/cart/summary/${currentUser.id}`),
+                    fetch(`/api/addresses/user/${currentUser.id}`)
+                ]);
+
+                const summaryData = await summaryRes.json();
+                if (summaryData.itemCount === 0) {
+                    alert('Your cart is empty! Redirecting to home...');
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                allAddresses = await addrRes.json();
+
+                // Initial Render
+                renderCartSummary(summaryData);
+
+                // Persistence Logic (isDefault OR default > LocalStorage > First Item)
+                const initialAddr = allAddresses.find(a => a.isDefault === true || a.default === true) ||
+                    allAddresses.find(a => a.id == localStorage.getItem('checkout_selected_address_id')) ||
+                    allAddresses[0];
+
+                selectAddressUI(initialAddr);
+
+            } catch (error) {
+                console.error('Error fetching checkout data:', error);
+            }
+        }
+
+        function renderCartSummary(data) {
+            const itemsList = document.getElementById('checkout-items-list');
+            itemsList.innerHTML = '';
+            data.items.forEach(item => {
+                itemsList.innerHTML += `
+                    <div class="d-flex justify-content-between small mb-2">
+                        <span>${item.product.name} x ${item.quantity}</span>
+                        <span>Rs. ${(item.product.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('checkout-subtotal').innerText = `Rs. ${data.subtotal.toFixed(2)}`;
+            document.getElementById('checkout-total').innerText = `Rs. ${data.grandTotal.toFixed(2)}`;
+        }
+
+        // ==========================================
+        // 2. ADDRESS MANAGEMENT
+        // ==========================================
+        function selectAddressUI(address) {
+            const actionLink = document.getElementById('address-action-link');
+            const container = document.getElementById('selected-address-card');
+
+            if (!address) {
+                selectedAddress = null;
+                actionLink.innerText = 'Add';
+                actionLink.setAttribute('onclick', 'openAddModal()');
+                container.innerHTML = `<div class="d-flex gap-3 align-items-center opacity-50 py-2"><i class="bi bi-geo-alt"></i><p class="small mb-0">No address selected.</p></div>`;
+                return;
+            }
+
+            selectedAddress = address;
+            localStorage.setItem('checkout_selected_address_id', address.id);
+            actionLink.innerText = 'Change';
+            actionLink.setAttribute('onclick', 'openAddressSelector()');
+
+            container.innerHTML = `
+                <div class="d-flex gap-3">
+                    <i class="bi bi-geo-alt text-accent"></i>
+                    <div>
+                        <h6 class="mb-1">${address.label}</h6>
+                        <p class="small text-white-50 mb-0">${address.streetAddress}</p>
+                        <p class="x-small text-white-50 mb-0">${address.fullName} - ${address.phone}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openAddressSelector() {
+            const list = document.getElementById('address-selection-list');
+            list.innerHTML = '';
+            allAddresses.forEach(addr => {
+                const isActive = selectedAddress && selectedAddress.id === addr.id;
+                list.innerHTML += `
+                    <div class="glass-card p-3 select-item-card ${isActive ? 'active-selection' : ''}" style="position: relative; transition: 0.2s;">
+                        <div class="d-flex justify-content-between align-items-center" onclick="selectAddressFromModal(${addr.id})" style="cursor: pointer; width: 85%;">
+                            <div>
+                                <h6 class="small fw-bold mb-1">${addr.label}</h6>
+                                <p class="x-small text-white-50 mb-0">${addr.streetAddress}</p>
+                                <p class="x-small text-white-50 mb-0">${addr.fullName} - ${addr.phone}</p>
+                            </div>
+                            ${isActive ? '<i class="bi bi-check-circle-fill text-accent fs-5"></i>' : ''}
+                        </div>
+                        <button class="btn btn-sm btn-outline-light rounded-circle edit-address-btn" 
+                                onclick="event.stopPropagation(); editAddress(${addr.id})"
+                                style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center; z-index: 10;">
+                            <i class="bi bi-pencil-square" style="font-size: 14px;"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            let myModal = bootstrap.Modal.getInstance(document.getElementById('addressSelectModal'));
+            if (!myModal) {
+                myModal = new bootstrap.Modal(document.getElementById('addressSelectModal'));
+            }
+            myModal.show();
+        }
+
+        function editAddress(id) {
+            const addr = allAddresses.find(a => a.id === id);
+            if (!addr) return;
+
+            const selectModal = bootstrap.Modal.getInstance(document.getElementById('addressSelectModal'));
+            if (selectModal) selectModal.hide();
+
+            document.getElementById('addressId').value = addr.id;
+            document.getElementById('addressLabel').value = addr.label;
+            document.getElementById('fullName').value = addr.fullName;
+            document.getElementById('streetAddress').value = addr.streetAddress;
+            document.getElementById('phone').value = addr.phone;
+            
+            document.getElementById('modalTitle').innerText = 'Edit Delivery Address';
+            
+            addressEntryModal.show();
+        }
+
+        async function selectAddressFromModal(id) {
+            try {
+                await fetch(`/api/addresses/set-default/${id}`, { method: 'PUT' });
+                selectAddressUI(allAddresses.find(a => a.id === id));
+                bootstrap.Modal.getInstance(document.getElementById('addressSelectModal')).hide();
+            } catch (err) { console.error(err); }
+        }
+
+        function openAddModal() {
+            const selectionModal = bootstrap.Modal.getInstance(document.getElementById('addressSelectModal'));
+            if (selectionModal) selectionModal.hide();
+            document.getElementById('addressForm').reset();
+            document.getElementById('addressId').value = '';
+            document.getElementById('modalTitle').innerText = 'New Delivery Address';
+            addressEntryModal.show();
+        }
+
+        function setupAddressForm() {
+            document.getElementById('addressForm').addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const id = document.getElementById('addressId').value;
+                const data = {
+                    userId: currentUser.id,
+                    label: document.getElementById('addressLabel').value,
+                    fullName: document.getElementById('fullName').value,
+                    streetAddress: document.getElementById('streetAddress').value,
+                    phone: document.getElementById('phone').value
+                };
+
+                try {
+                    const response = await fetch(id ? `/api/addresses/update/${id}` : '/api/addresses/add', {
+                        method: id ? 'PUT' : 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        addressEntryModal.hide();
+                        const updatedAddrRes = await fetch(`/api/addresses/user/${currentUser.id}`);
+                        allAddresses = await updatedAddrRes.json();
+
+                        const newAddr = !id ? allAddresses[allAddresses.length - 1] : allAddresses.find(a => a.id == id);
+                        selectAddressUI(newAddr);
+                        if (!id) await fetch(`/api/addresses/set-default/${newAddr.id}`, { method: 'PUT' });
+                    }
+                } catch (error) { console.error('Error saving address:', error); }
+            });
+        }
+
+        // ==========================================
+        // 3. STRIPE INITIALIZATION
+        // ==========================================
+        const stripe = Stripe('pk_test_51TXNvbCQaL6ApduWBW5AKSRepxwQcpUHxEFAZxLqL6PUH0Its8OjiwSArpN0hNxOJtscuinek9IvvQePLOY5k4ad005FWQESDp'); // PLACEHOLDER
+        const elements = stripe.elements();
+
+        // Custom styling for Stripe Element
+        const style = {
+            base: {
+                color: '#fff',
+                fontFamily: '"Inter", sans-serif',
+                fontSmoothing: 'antialiased',
+                fontSize: '16px',
+                '::placeholder': { color: '#aab7c4' }
+            },
+            invalid: {
+                color: '#fa755a',
+                iconColor: '#fa755a'
+            }
+        };
+
+        const card = elements.create('card', { style: style });
+        card.mount('#card-element');
+
+        card.on('change', function (event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+        // ==========================================
+        // 4. ORDER PLACEMENT
+        // ==========================================
+        async function placeOrder() {
+            if (!selectedAddress) {
+                alert('Please select a delivery address');
+                return;
+            }
+
+            const placeOrderBtn = document.querySelector('button[onclick="placeOrder()"]');
+            placeOrderBtn.disabled = true;
+            placeOrderBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+            try {
+                // STEP 1: Create Order in Backend
+                const orderResponse = await fetch('/api/orders/place', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: currentUser.id,
+                        addressId: selectedAddress.id,
+                        paymentMethod: 'STRIPE',
+                        deliveryType: deliveryType,
+                        scheduledDate: deliveryType === 'SCHEDULED' ? scheduledDate : null,
+                        scheduledTimeSlot: deliveryType === 'SCHEDULED' ? scheduledSlot : null
+                    })
+                });
+
+                if (!orderResponse.ok) {
+                    throw new Error(await orderResponse.text());
+                }
+
+                const orderData = await orderResponse.json();
+                const amountInCents = Math.round(orderData.totalAmount * 100);
+
+                // STEP 2: Create Payment Intent
+                const intentResponse = await fetch('/api/payments/create-payment-intent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId: orderData.id,
+                        amount: amountInCents,
+                        currency: 'lkr'
+                    })
+                });
+
+                const intentData = await intentResponse.json();
+
+                // STEP 3: Confirm Payment with Stripe
+                const result = await stripe.confirmCardPayment(intentData.clientSecret, {
+                    payment_method: {
+                        card: card,
+                        billing_details: {
+                            name: selectedAddress.fullName,
+                            phone: selectedAddress.phone
+                        }
+                    }
+                });
+
+                if (result.error) {
+                    // Show error to customer
+                    document.getElementById('card-errors').textContent = result.error.message;
+                    placeOrderBtn.disabled = false;
+                    placeOrderBtn.innerText = 'Place Order';
+                } else {
+                    // The payment has been processed!
+                    if (result.paymentIntent.status === 'succeeded') {
+                        // Display and link PDF Download button on the success modal
+                        const pdfBtn = document.getElementById('downloadPdfBtn');
+                        pdfBtn.style.display = 'inline-block';
+                        pdfBtn.onclick = () => {
+                            window.location.href = `/api/orders/${orderData.id}/pdf`;
+                        };
+                        
+                        new bootstrap.Modal(document.getElementById('successModal')).show();
+                    }
+                }
+
+            } catch (error) {
+                console.error('Order placement failed:', error);
+                alert('Failed to place order: ' + error.message);
+                placeOrderBtn.disabled = false;
+                placeOrderBtn.innerText = 'Place Order';
+            }
+        }
+    </script>
+
+    <style>
+        .select-item-card {
+            transition: 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .select-item-card:hover {
+            border-color: var(--accent);
+            background: rgba(46, 204, 113, 0.05);
+        }
+
+        .active-selection {
+            border-color: var(--accent) !important;
+            background: rgba(46, 204, 113, 0.1) !important;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .active-slot {
+            border-color: var(--accent) !important;
+            background: rgba(46, 204, 113, 0.1) !important;
+            color: var(--accent) !important;
+        }
+
+        .date-pill {
+            min-width: 90px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.2s;
+        }
+
+        .date-pill.active {
+            border-color: var(--accent) !important;
+            background: rgba(46, 204, 113, 0.1) !important;
+        }
+    </style>
+</body>
+
+</html>

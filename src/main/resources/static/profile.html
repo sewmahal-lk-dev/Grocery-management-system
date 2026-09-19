@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | My Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-black text-white">
+
+    <!-- Reusable Navbar (Copy from index.html) -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex flex-column" href="index.html">
+                <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
+            </a>
+            <div class="d-flex gap-3">
+                <a href="index.html" class="btn btn-glass-pill btn-sm">Back to Shop</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row g-4">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3">
+                <div class="glass-card p-4 sticky-top" style="top: 100px;">
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar-lg mb-3">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <p class="small opacity-50">University Student</p>
+                    </div>
+                    
+                    <div class="profile-nav d-flex flex-column gap-2">
+                        <a href="#" class="nav-link-glass active"><i class="bi bi-person"></i> Personal Info</a>
+                        <a href="orders.html" class="nav-link-glass"><i class="bi bi-box-seam"></i> Order History</a>
+                        <a href="addresses.html" class="nav-link-glass"><i class="bi bi-geo-alt"></i> Saved Addresses</a>
+                        <a href="payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payment Methods</a>
+                        <hr class="luxury-divider">
+                        <a href="login.html" class="nav-link-glass text-danger"><i class="bi bi-box-arrow-left"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Profile Content -->
+            <div class="col-lg-9">
+                <div class="glass-card p-5">
+                    <h2 class="section-headline mb-4">Account Details</h2>
+                    <form onsubmit="saveProfile(event)">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label opacity-75">First Name</label>
+                                <input type="text" id="profileFirstName" class="form-control bg-dark text-white border-secondary" value="Nimal">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label opacity-75">Last Name</label>
+                                <input type="text" id="profileLastName" class="form-control bg-dark text-white border-secondary" value="Perera">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label opacity-75">Email</label>
+                                <input type="email" id="profileEmail" class="form-control bg-dark text-white border-secondary" value="nimal@example.com">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label opacity-75">Phone</label>
+                                <input type="tel" id="profilePhone" class="form-control bg-dark text-white border-secondary" value="+94 77 123 4567">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label opacity-75">University</label>
+                                <input type="text" id="profileUniversity" class="form-control bg-dark text-white border-secondary" value="University of Colombo">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label opacity-75">Bio</label>
+                                <textarea id="profileBio" class="form-control bg-dark text-white border-secondary" rows="4">Undergraduate student interested in sustainable and eco-friendly living.</textarea>
+                            </div>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-end">
+                            <button type="submit" class="btn btn-glass-pill">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Recent Orders Preview -->
+                <div class="glass-card p-5 mt-4">
+                    <h3 class="section-headline mb-4">Recent Activity</h3>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr class="opacity-50">
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>#EG-9982</td>
+                                    <td>May 04, 2026</td>
+                                    <td><span class="badge bg-success-subtle text-success">Delivered</span></td>
+                                    <td>$42.50</td>
+                                </tr>
+                                <tr>
+                                    <td>#EG-8741</td>
+                                    <td>April 28, 2026</td>
+                                    <td><span class="badge bg-warning-subtle text-warning">In Transit</span></td>
+                                    <td>$12.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = 'http://localhost:8080';
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Get user data from localStorage
+            const userJson = localStorage.getItem('loggedInUser');
+
+            if (!userJson) {
+                // Redirect to login page if not logged in
+                alert("Please log in first!");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const user = JSON.parse(userJson);
+            currentUser = user;
+            const fullName = (user.name || "").trim();
+            const nameParts = fullName ? fullName.split(/\s+/) : [];
+
+            // 2. Fill form fields with user data
+            document.getElementById('profileFirstName').value = nameParts[0] || "";
+            document.getElementById('profileLastName').value = nameParts.slice(1).join(" ");
+            document.getElementById('profileEmail').value = user.email || "";
+            document.getElementById('profilePhone').value = user.phone || user.Phone || "";
+            document.getElementById('profileUniversity').value = user.university || user.University || "";
+            document.getElementById('profileBio').value = user.bio || user.Bio || "";
+        });
+
+        async function saveProfile(event) {
+            if (event) event.preventDefault();
+
+            if (!currentUser) {
+                alert("Unable to find user session. Please log in again.");
+                window.location.href = "login.html";
+                return;
+            }
+
+            const firstName = document.getElementById('profileFirstName').value.trim();
+            const lastName = document.getElementById('profileLastName').value.trim();
+            const fullName = `${firstName} ${lastName}`.trim();
+            const userId = currentUser.id || currentUser.userId || currentUser.userID || currentUser.user_id || currentUser.Id;
+
+            if (!userId) {
+                alert("User ID not found. Please log in again and try.");
+                return;
+            }
+
+            // Send only the fields required by backend updateUser(...) method.
+            const updatePayload = {
+                name: fullName,
+                phone: document.getElementById('profilePhone').value.trim(),
+                university: document.getElementById('profileUniversity').value.trim(),
+                bio: document.getElementById('profileBio').value.trim()
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/users/update/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatePayload)
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || `Profile update failed (HTTP ${response.status})`);
+                }
+
+                const savedUser = await response.json().catch(() => updatePayload);
+                currentUser = { ...currentUser, ...savedUser };
+                localStorage.setItem('loggedInUser', JSON.stringify(currentUser));
+                showToast();
+            } catch (error) {
+                console.error('Profile update error:', error);
+                alert(`Backend profile update failed: ${error.message}`);
+            }
+        }
+
+        function showToast() {
+
+            const toast = document.getElementById('save-toast');
+
+            // 2. Show the toast
+            toast.style.display = 'block';
+
+            // 3. Auto-hide after 3 seconds
+            setTimeout(() => {
+                hideToast();
+            }, 3000);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('save-toast');
+            toast.style.animation = 'slideIn 0.4s ease reverse forwards';
+            setTimeout(() => {
+                toast.style.display = 'none';
+                toast.style.animation = 'slideIn 0.4s ease forwards'; // Reset for next time
+            }, 400);
+        }
+    </script>
+    <!-- Notification Container -->
+    <div id="save-toast" class="position-fixed bottom-0 end-0 p-3" style="display:none; z-index:1080;">
+        <div class="glass-card px-4 py-3 d-flex align-items-center gap-3">
+            <i class="bi bi-check-circle-fill text-success"></i>
+            <span>Profile updated successfully.</span>
+            <button type="button" class="btn btn-sm btn-outline-light ms-2" onclick="hideToast()">Close</button>
+        </div>
+    </div>
+</body>
+</html>

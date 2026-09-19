@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders | EverGreen Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="d-flex">
+        <!-- Reusable Sidebar -->
+        <div class="glass-sidebar-left p-4" style="width: 280px; height: 100vh; border-right: 1px solid rgba(255,255,255,0.1);">
+            <div class="mb-5">
+                <span class="logo-text">Ever<span class="text-accent">Green</span></span>
+                <p class="tagline">Admin Suite</p>
+            </div>
+            <nav class="nav flex-column gap-2">
+                <a href="admin-dashboard.html" class="nav-link-glass"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a href="admin-inventory.html" class="nav-link-glass"><i class="bi bi-box-seam"></i> Inventory</a>
+                <a href="admin-products.html" class="nav-link-glass"><i class="bi bi-journal-plus"></i> Manage Products</a>
+                <a href="admin-orders.html" class="nav-link-glass active"><i class="bi bi-cart-check"></i> Orders</a>
+                <a href="admin-customers.html" class="nav-link-glass"><i class="bi bi-people"></i> Customers</a>
+                <a href="admin-logistics.html" class="nav-link-glass"><i class="bi bi-truck"></i> Logistics</a>
+                <a href="admin-payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payments</a>
+                <a href="login.html" class="nav-link-glass text-danger mt-5"><i class="bi bi-box-arrow-left"></i> Logout</a>
+            </nav>
+        </div>
+
+        <main class="flex-grow-1 p-5">
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="section-headline">Logistics Command</h2>
+                    <p class="section-subheadline">Fulfilling orders with AI-driven weight verification</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn-glass-pill"><i class="bi bi-printer me-2"></i> Manifest</button>
+                    <button class="btn-evergreen-pill">Process All</button>
+                </div>
+            </header>
+
+            <!-- Order Status Tabs -->
+            <div class="category-filter-bar mb-4">
+                <button class="btn-filter active">All Orders</button>
+                <button class="btn-filter">Weight Pending <span class="badge bg-accent text-dark ms-1">4</span></button>
+                <button class="btn-filter">Out for Delivery</button>
+                <button class="btn-filter">Completed</button>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="glass-card">
+                <div class="table-responsive">
+                    <table class="table table-dark align-middle">
+                        <thead>
+                            <tr class="opacity-50 x-small text-uppercase">
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Logistics</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Dynamically loaded -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Client-side Guard: Only allow logged-in Admins to access this panel
+        const userJson = localStorage.getItem('loggedInUser');
+        if (!userJson) {
+            alert("Access Denied! Please sign in first.");
+            window.location.href = '../login.html';
+        } else {
+            const user = JSON.parse(userJson);
+            if (user.role !== 'ADMIN') {
+                alert("Access Denied! You do not have administrator privileges.");
+                window.location.href = '../index.html';
+            }
+        }
+
+        // Dynamic Orders Loading and Status Management
+        document.addEventListener("DOMContentLoaded", () => {
+            loadOrders();
+        });
+
+        function loadOrders() {
+            const tbody = document.getElementById("ordersTableBody");
+            tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4"><span class="spinner-border spinner-border-sm text-accent me-2"></span>Loading orders...</td></tr>`;
+
+            fetch("/api/admin/orders")
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load orders");
+                    return res.json();
+                })
+                .then(orders => {
+                    tbody.innerHTML = "";
+                    if (orders.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 opacity-50">No orders found in the database.</td></tr>`;
+                        return;
+                    }
+
+                    orders.forEach(order => {
+                        const itemsPreview = order.items ? order.items.map(item => `
+                            <span class="item-thumb">${escapeHtml(item.productName)} x ${item.quantity}</span>
+                        `).join('') : '';
+
+                        const statusOptions = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(s => `
+                            <option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>
+                        `).join('');
+
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td><span class="fw-bold">#EVG-${order.id}</span></td>
+                            <td>
+                                <div class="fw-bold">${order.customer ? escapeHtml(order.customer.name) : 'Guest'}</div>
+                                <div class="x-small opacity-50">${order.shippingAddress ? escapeHtml(order.shippingAddress.streetAddress) : 'No Address'}</div>
+                                <div class="x-small opacity-50">${order.customer && order.customer.phone ? escapeHtml(order.customer.phone) : ''}</div>
+                            </td>
+                            <td>
+                                <div class="order-items-preview">
+                                    ${itemsPreview}
+                                </div>
+                            </td>
+                            <td><span class="product-price" style="font-size: 1rem;"><span class="currency">Rs.</span> ${order.totalAmount.toFixed(2)}</span></td>
+                            <td><span class="badge ${getStatusBadgeClass(order.status)}">${order.status}</span></td>
+                            <td>
+                                <select class="form-select auth-input py-1 px-2" style="font-size: 0.75rem; background-color: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15);" onchange="updateOrderStatus(${order.id}, this.value)">
+                                    ${statusOptions}
+                                </select>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-danger">Error loading orders: ${err.message}</td></tr>`;
+                });
+        }
+
+        function getStatusBadgeClass(status) {
+            switch (status) {
+                case 'PENDING': return 'bg-warning text-dark';
+                case 'CONFIRMED': return 'bg-info text-dark';
+                case 'SHIPPED': return 'bg-primary text-white';
+                case 'DELIVERED': return 'bg-success text-white';
+                case 'CANCELLED': return 'bg-danger text-white';
+                default: return 'bg-secondary text-white';
+            }
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            fetch(`/api/admin/orders/${orderId}/status`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to update status");
+                return res.json();
+            })
+            .then(updated => {
+                loadOrders(); // Refresh table
+            })
+            .catch(err => {
+                alert("Error updating order status: " + err.message);
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>

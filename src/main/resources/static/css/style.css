@@ -1,0 +1,1377 @@
+:root {
+    --glass: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent: #00ff88;
+    --text-main: #ffffff; /* Changed from #000000 */
+}
+
+body {
+    background-color: #050505 !important; /* Force dark background */
+    background-image:
+        radial-gradient(at 0% 0%, rgba(0, 255, 136, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(0, 163, 255, 0.1) 0px, transparent 50%);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+}
+
+/* Logo & Tagline Styles */
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -1px;
+    color: var(--text-main);
+}
+
+.tagline {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+/* Search Bar Customization */
+.search-container {
+    position: relative;
+    max-width: 500px;
+}
+
+.search-input {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 50px !important;
+    color: white !important;
+    padding: 10px 20px 10px 45px !important;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    background: rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+    border-color: var(--accent) !important;
+}
+
+.search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    opacity: 0.8;
+}
+
+/* Icons & Links */
+.nav-icon-link {
+    color: var(--text-main);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    position: relative;
+    padding: 5px;
+}
+
+.nav-icon-link:hover {
+    color: var(--accent);
+}
+
+.bg-accent {
+    background-color: var(--accent) !important;
+}
+
+/* Fine-tuning existing navbar */
+.navbar {
+    padding: 0.5rem 0;
+}
+
+.glass-card {
+    background: var(--glass);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 25px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.category-pill {
+    color: var(--accent);
+    background: rgba(0, 255, 136, 0.1);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.btn-evergreen {
+    background: var(--accent);
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    padding: 10px;
+    width: 100%;
+}
+
+/* Styling for the Cart Icon and Badge */
+.cart-badge {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: var(--accent);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+}
+/* Solid Accent Button */
+/* Slim Solid Accent Button */
+.btn-evergreen-pill {
+    background-color: var(--accent);
+    color: #050505;
+    font-weight: 600;
+    font-size: 0.85rem;      /* Smaller font */
+    padding: 8px 24px;       /* Reduced padding */
+    border-radius: 50px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-evergreen-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(0, 255, 136, 0.2);
+}
+
+/* Slim Glass Outline Button */
+.btn-glass-pill {
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 0.85rem;      /* Smaller font */
+    padding: 8px 24px;       /* Reduced padding */
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.btn-glass-pill:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+/* Section Typography */
+.section-headline {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-icon {
+    color: var(--accent);
+    filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.4));
+    font-size: 1.5rem;
+}
+
+.section-subheadline {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+}
+
+/* Product Card Refinements */
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.glass-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent);
+    transform: translateY(-5px);
+}
+
+.product-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.product-desc {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.4;
+}
+
+.product-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.product-price .currency {
+    font-size: 0.9rem;
+    color: var(--accent);
+    margin-right: 2px;
+}
+
+/* Stock Indicator */
+.stock-indicator {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Minimalist Plus Button */
+.btn-add-cart {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-add-cart:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+}
+/* 1. Expand Header/Hero Breathing Room */
+.hero-section {
+    min-height: 60vh; /* Takes up 60% of the screen height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centers text vertically in that space */
+    padding: 120px 0; /* Huge vertical breathing room */
+}
+
+/* 2. The Luxury Divider */
+.luxury-divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1) 20%,
+        rgba(255, 255, 255, 0.1) 80%,
+        transparent
+    );
+    margin: 0 auto;
+    width: 80%; /* Doesn't touch the edges, feels more intentional */
+    opacity: 1;
+}
+
+/* 3. Product Showcase Spacing */
+.product-showcase {
+    padding-top: 40px;
+    /* Subtle background shift to distinguish section */
+    background: linear-gradient(to bottom, transparent, rgba(0, 255, 136, 0.02));
+}
+
+/* Adjust headline spacing */
+.section-headline {
+    margin-bottom: 12px;
+}
+/* The Product Card Base */
+.product-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 24px;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    height: 100%;
+    overflow: hidden;
+}
+
+/* The Hover Glow Effect */
+.product-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent);
+    transform: translateY(-8px); /* Card lifts up */
+    /* This creates the green glow */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(0, 255, 136, 0.15);
+}
+
+/* Making the product title pop more */
+.product-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.product-image-container {
+    width: 100%;
+    height: 220px; /* Force a consistent height for all cards */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.02); /* Very subtle background for the "box" */
+    border-radius: 15px;
+    overflow: hidden;
+    padding: 15px; /* Adds a little breathing room so the product doesn't touch the edges */
+}
+
+.product-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* This keeps the whole product visible without stretching */
+    transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* Subtle drop shadow to give flat images depth */
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+}
+
+/* Hover effect stays the same but feels smoother */
+.product-card:hover .product-img {
+    transform: scale(1.08) translateY(-5px);
+}
+
+/* Styling for the tags and buttons inside */
+.stock-tag {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.price-tag {
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.currency {
+    color: var(--accent);
+    font-size: 0.9rem;
+    vertical-align: top;
+    margin-right: 2px;
+}
+
+/* The Add Button with its own glow */
+.btn-add-glow {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.btn-add-glow:hover {
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 15px var(--accent);
+}
+/* Trending Icon Glow */
+.trending-icon {
+    color: var(--accent);
+    filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.5));
+    font-size: 1.4rem;
+}
+
+/* Wide Drop Card */
+.drop-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.drop-card:hover {
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.07);
+    transform: scale(1.01);
+}
+
+.drop-image-wrap {
+    height: 250px; /* Taller for horizontal cards */
+    background: rgba(255, 255, 255, 0.02);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.drop-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Keeps the product looking clean */
+    padding: 20px;
+}
+
+.promo-tag {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    background: var(--accent);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+}
+
+/* Badges */
+.timer-badge {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 50px;
+    border: 1px solid var(--accent);
+}
+
+.promo-tag {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #000;
+    background: var(--accent);
+    padding: 3px 10px;
+    border-radius: 4px;
+}
+
+/* Accent Price */
+.text-accent {
+    color: var(--accent);
+}
+
+/* Collection Icon Styling */
+.collection-icon {
+    color: var(--accent);
+    filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.4));
+    font-size: 1.45rem;
+}
+
+/* Specific styling for All Products area if you want to dim it slightly
+   to keep focus on "Curated" and "Daily Drop" */
+.all-products .product-card {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.all-products .product-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.view-all-link {
+    color: var(--accent) !important; /* Ensure it uses your green color */
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+    white-space: nowrap; /* Prevents the text from wrapping */
+}
+
+.view-all-link:hover {
+    color: #fff !important;
+    transform: translateX(5px); /* Subtle slide effect */
+}
+
+/* Category Filter Bar */
+.category-filter-bar {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.category-filter-bar::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+.btn-filter {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 0.3s ease;
+}
+
+.btn-filter:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-filter.active {
+    background: var(--accent);
+    color: #050505;
+    border-color: var(--accent);
+    font-weight: 600;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+/* Smooth scroll adjustment to account for sticky nav */
+#collection-section {
+    scroll-margin-top: 100px;
+}
+
+/* Footer Styles */
+.footer-section {
+    background: linear-gradient(to top, rgba(0, 255, 136, 0.05), transparent);
+    padding-top: 80px;
+    margin-top: 100px;
+}
+
+.footer-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: #fff;
+}
+
+.footer-desc {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.6;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--accent);
+    padding-left: 5px;
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: var(--accent);
+    color: #000;
+    transform: translateY(-3px);
+}
+
+.newsletter-form .form-control {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+    border-radius: 50px 0 0 50px !important;
+    padding-left: 20px;
+}
+
+.newsletter-form .btn-evergreen-pill {
+    border-radius: 0 50px 50px 0 !important;
+}
+
+/* Auth Layout - Pure Deep Dark */
+/* Auth Layout - Updated for Scrolling */
+.auth-page {
+    background: #050505 !important;
+    /* Removed overflow: hidden to allow scrolling */
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    /* Added padding so the card doesn't touch the edges on mobile */
+    padding: 40px 0; 
+}
+
+.auth-page::before {
+    content: '';
+    position: fixed; 
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.08) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.auth-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 440px;
+    margin: auto; 
+    padding: 20px;
+}
+/* Refined Glass Card */
+.auth-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 50px 40px;
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: white;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.auth-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* Dark Inputs matching your Search Bar */
+.auth-input {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: white !important;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.auth-input:focus {
+    border-color: var(--accent) !important;
+    background: rgba(255, 255, 255, 0.07) !important;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.1);
+}
+
+.forgot-link {
+    font-size: 0.8rem;
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.forgot-link:hover {
+    opacity: 1;
+}
+
+/* Custom Checkbox */
+.custom-check {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.custom-check:checked {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* Profile Specifics */
+.profile-avatar-lg {
+    font-size: 4rem;
+    color: var(--accent);
+    filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
+}
+
+.nav-link-glass {
+    padding: 12px 20px;
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+}
+
+.nav-link-glass:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.nav-link-glass.active {
+    background: rgba(0, 255, 136, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.table-dark {
+    --bs-table-bg: transparent !important;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.table > :not(caption) > * > * {
+    padding: 20px 15px;
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.badge {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+/* Profile Content Fix - No more vertical stretching */
+.profile-container {
+    min-height: auto !important; /* Forces it to only be as tall as the content */
+    padding-bottom: 50px;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08); /* Removed the thick green border */
+    border-radius: 20px;
+    height: auto !important; /* Prevents stretching */
+    display: block !important; /* Ensures it doesn't try to flex-grow */
+    margin-bottom: 20px;
+}
+
+/* Remove that giant gap under the button */
+form.row {
+    margin-bottom: 0 !important;
+}
+
+.auth-input {
+    background: rgba(255, 255, 255, 0.05) !important;
+    height: 45px !important;
+}
+/* Toast Notification Style */
+.toast-glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: white;
+    padding: 15px;
+    min-width: 280px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: none; /* Hidden by default */
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.4s ease forwards;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Accent Progress Bar at the bottom of the toast */
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
+    width: 100%;
+}
+
+.text-accent {
+    color: var(--accent) !important;
+}
+
+/* Order History Specifics */
+.order-items-preview {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.item-thumb {
+    font-size: 0.8rem;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.border-white-10 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Badge Refinement */
+.badge {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.text-accent {
+    color: #00FF88 !important;
+}
+
+.modal-content.glass-card {
+    background: rgba(15, 15, 15, 0.85);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop.show {
+    opacity: 0.8;
+    background-color: #000;
+}
+
+/* Reusing your existing pill button style but smaller */
+.btn-glass-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-glass-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+/* Fix for modal layering */
+.modal {
+    z-index: 1060 !important;
+}
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
+/* Ensure the close button is visible on your dark theme */
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Ensure the modal is dark and glassy */
+.modal-content.glass-card {
+    background: rgba(15, 15, 15, 0.9) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 20px;
+}
+
+/* Fix the close button color */
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Ensure the total text stands out */
+.text-accent {
+    color: #00FF88 !important; /* Your Evergreen Green */
+}
+
+/* Divider inside the modal */
+.border-white-10 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Tracking Timeline Styles */
+.tracking-timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.tracking-timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 30px;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -28px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #333;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+/* State: Completed */
+.timeline-item.completed .timeline-dot {
+    background: #fff;
+    border-color: #fff;
+}
+
+/* State: Active/Current */
+.timeline-item.active .timeline-dot {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 15px var(--accent);
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+/* Card highlighting for default/active address */
+.border-accent-soft {
+    border: 1px solid rgba(0, 255, 136, 0.3) !important;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0, 255, 136, 0.02) 100%);
+}
+
+/* Glass Inputs for the Modal */
+.glass-input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 12px;
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent);
+    color: white;
+    box-shadow: none;
+}
+
+/* Dropdown Menu Glassmorphism */
+.dropdown-glass {
+    background: rgba(20, 20, 20, 0.95) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Styling the Dropdown to match Minimal Luxury theme */
+.dropdown-glass {
+    background: rgba(15, 15, 15, 0.9) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px;
+    padding: 8px;
+}
+
+.dropdown-item {
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--accent) !important;
+}
+
+/* Ensure the button matches your standard glass pill style */
+.btn-glass-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.btn-glass-pill:hover {
+    background: var(--accent); /* Uses your EverGreen green */
+    color: black;
+    border-color: var(--accent);
+}
+/* Payment Card Specific Styles */
+.payment-card {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.3s ease;
+    cursor: default;
+}
+
+.payment-card:hover {
+    transform: translateY(-5px);
+}
+
+.visa-gradient {
+    background: linear-gradient(135deg, rgba(25, 25, 25, 0.9) 0%, rgba(40, 40, 40, 0.8) 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.tracking-widest {
+    letter-spacing: 3px;
+}
+
+.x-small {
+    font-size: 0.7rem;
+}
+
+/* Reusing your glass input logic */
+.glass-input {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+}
+
+/* Cart Specific Styles */
+.item-img-container img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.quantity-control button {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.quantity-control button:hover {
+    background: var(--accent);
+    color: black;
+    border-color: var(--accent);
+}
+
+/* Sticky Summary Logic */
+.sticky-top {
+    z-index: 10;
+}
+
+.bg-white-5 {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.x-small {
+    font-size: 0.75rem;
+}
+
+.border-accent {
+    border: 1px solid var(--accent) !important;
+}
+
+.active-option {
+    border-color: var(--accent) !important;
+    background: rgba(0, 255, 136, 0.05) !important;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.border-white-10 {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-sidebar-right {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Hidden by default */
+    width: 350px;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1050;
+    transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-sidebar-right.active {
+    right: 0;
+}
+
+#cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    z-index: 1040;
+}
+
+#cart-overlay.active {
+    display: block;
+}
+
+.bg-accent { background-color: var(--accent) !important; }
+:root {
+    --accent: #2ecc71; /* Your green accent color */
+}
+
+/* Side Cart Base Styling */
+.glass-sidebar-right {
+    position: fixed;
+    top: 0;
+    right: -400px; /* Hidden by default */
+    width: 400px;
+    height: 100vh;
+    background: rgba(10, 10, 10, 0.8); /* Dark base */
+    backdrop-filter: blur(20px); /* The Glass effect */
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1050;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* When the cart is open */
+.glass-sidebar-right.active {
+    right: 0;
+}
+
+/* Dark Overlay */
+#cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    z-index: 1040;
+}
+
+#cart-overlay.active {
+    display: block;
+}
+
+/* Small Detail Fixes for Items */
+.animate-slide-in {
+    animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.bg-accent {
+    background-color: var(--accent) !important;
+}
+
+/* Container for the list of items */
+#cart-items {
+    padding: 20px;
+    max-height: calc(100vh - 250px); /* Leaves room for header and footer */
+    overflow-y: auto;
+}
+
+/* Individual Item Styling */
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--accent);
+}
+
+.cart-item-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    padding: 5px;
+}
+
+.cart-item-info {
+    flex-grow: 1;
+}
+
+.cart-item-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: #fff;
+}
+
+.cart-item-price {
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 700;
+}
+/* Ensure the sidebar uses your deep dark background and blur */
+.glass-sidebar-right {
+    background: rgba(5, 5, 5, 0.85) !important; /* Matches body background */
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-left: 1px solid var(--glass-border);
+}
+
+/* Fix for the sticky footer inside the cart */
+.glass-sidebar-right .bg-black {
+    background: transparent !important; /* Let the glass effect show through */
+}
+
+/* Tracking/Letter spacing for luxury feel[cite: 1] */
+.tracking-wider {
+    letter-spacing: 2px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Style for items injected via JavaScript */
+.cart-item-luxury {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.cart-item-luxury:hover {
+    border-color: var(--accent);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Slim Button Override for Sidebar */
+#side-cart .btn-evergreen-pill, 
+#side-cart .btn-glass-pill {
+    padding: 10px 20px !important; /* Reduced vertical padding */
+    font-size: 0.75rem !important;  /* Smaller, more professional font[cite: 1] */
+    border-radius: 50px !important; /* Keeps the pill shape[cite: 1] */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle Hover Lift[cite: 1] */
+#side-cart .btn-evergreen-pill:hover {
+    box-shadow: 0 8px 20px rgba(0, 255, 136, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Quantity Buttons inside Drawer[cite: 1] */
+.btn-qty {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: white;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-qty:hover {
+    background: var(--accent);
+    color: black;
+    border-color: var(--accent);
+}
+
+.cart-item-luxury {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 12px;
+    backdrop-filter: blur(5px); /* Extra glass effect[cite: 1] */
+}
+/* Specific Story Page Hero */
+.hero-section h1 {
+    letter-spacing: -2px;
+    filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.2));
+}
+
+/* Make cards in story page slightly more transparent for better glass effect */
+.story-page .glass-card {
+    background: rgba(255, 255, 255, 0.015);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-sidebar-right {
+    position: fixed;
+    top: 0;
+    right: -400px; /* This keeps it hidden off-screen */
+    width: 400px;
+    height: 100vh;
+    transition: right 0.4s ease; /* This creates the sliding effect */
+    z-index: 2000;
+}
+
+.glass-sidebar-right.active {
+    right: 0; /* This slides it into view */
+}
