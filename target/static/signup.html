@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | Sign Up</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+    <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+        <div class="auth-wrapper" style="max-width: 500px;">
+            <div class="auth-card">
+                <!-- Brand -->
+                <div class="text-center mb-5">
+                    <a class="navbar-brand d-flex flex-column align-items-center" href="index.html">
+                        <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
+                        <span class="tagline">Your smart grocery store</span>
+                    </a>
+                </div>
+
+                <h2 class="auth-title">Join EverGreen</h2>
+                <p class="auth-subtitle">Create an account to start your fresh journey</p>
+
+                <form id="signupForm" action="/register" method="post">
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <label class="auth-label">Full Name</label>
+                            <input id="name" type="text" name="name" class="form-control auth-input" placeholder="Nethmi Amasha" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="auth-label">Email Address</label>
+                        <input id="email" type="email" name="email" class="form-control auth-input" placeholder="name@example.com" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="auth-label">Phone Number</label>
+                        <input id="phone" type="tel" name="phone" class="form-control auth-input" placeholder="+94 7X XXX XXXX" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="auth-label">Password</label>
+                        <input id="password" type="password" name="password" class="form-control auth-input" placeholder="••••••••" required>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input custom-check" type="checkbox" id="terms" required>
+                        <label class="form-check-label text-white-50 small" for="terms">
+                            I agree to the <a href="#" class="text-accent text-decoration-none">Terms & Conditions</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-evergreen-pill w-100 py-3 mb-4">Create Account</button>
+
+                    <p class="text-center small text-white-50">
+                        Already have an account? <a href="login.html" class="text-accent text-decoration-none">Sign In</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+<script>
+    async function registerUser(event) {
+        event.preventDefault(); // Prevent form refresh
+
+        // Get form data
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        const password = document.getElementById('password').value;
+
+        const userData = {
+            name: name,
+            email: email,
+            phone: phone,
+            password: password
+        };
+
+        try {
+            // Send data to backend
+            const response = await fetch('http://localhost:8080/api/users/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const result = await response.text();
+
+            if (response.ok) {
+                alert("User registered successfully!");
+                window.location.href = "login.html"; // Redirect to login page
+            } else {
+                alert("An error occurred: " + result);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Unable to connect to the backend!");
+        }
+    }
+
+    // Run this function when the form is submitted
+    // 'signupForm' is the id of your <form>
+    document.getElementById('signupForm').addEventListener('submit', registerUser);
+</script>
+</body>
+</html>

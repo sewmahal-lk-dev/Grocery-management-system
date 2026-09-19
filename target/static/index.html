@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>EverGreen | Premium Grocery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex flex-column" href="#">
+                <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
+                <span class="tagline">Your smart grocery store</span>
+            </a>
+
+            <div class="flex-grow-1 mx-lg-5 mx-3">
+                <form id="search-form" class="search-container" onsubmit="event.preventDefault(); handleSearch();">
+                    <input id="search-input" class="form-control search-input" type="search" placeholder="Search for groceries..." aria-label="Search">
+                    <i class="bi bi-search search-icon" style="cursor: pointer;" onclick="handleSearch()"></i>
+                </form>
+            </div>
+
+            <div class="d-flex align-items-center gap-4">
+
+                <!-- AUTHENTICATED USER VIEW -->
+                <div id="authenticatedView" class="dropdown" style="display: none;">
+                    <!-- Use 'button' or 'javascript:void(0)' to prevent the URL from changing to /# -->
+                    <a href="javascript:void(0)" class="nav-icon-link d-flex align-items-center dropdown-toggle"
+                    id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-person-check-fill fs-4 text-accent"></i>
+                        <!-- 'User' යනු Placeholder එකකි -->
+                        <span id="userNameDisplay" class="ms-2 d-none d-md-inline text-accent">User</span>
+                    </a>
+                    <!-- Ensure the menu is inside the same div -->
+                    <ul class="dropdown-menu dropdown-menu-end bg-dark border-secondary" aria-labelledby="userDropdown">
+                        <li><a class="dropdown-item text-white" href="profile.html">My Profile</a></li>
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="logout()">Logout</a></li>
+                    </ul>
+                </div>
+
+
+                <!-- GUEST VIEW -->
+                <div id="guestView" style="display: none;">
+                    <a href="login.html" class="nav-icon-link d-flex align-items-center">
+                        <i class="bi bi-person-circle fs-4"></i>
+                        <span class="ms-2 d-none d-md-inline">Login</span>
+                    </a>
+                </div>
+
+                <div class="position-relative cursor-pointer" onclick="toggleCart(); return false;">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-accent text-black" style="font-size: 0.6rem;">0</span>
+                </div>
+                
+                <div id="side-cart" class="glass-sidebar-right">
+                    <div class="p-4 d-flex flex-column h-100">
+                        <!-- Header -->
+                        <div class="d-flex justify-content-between align-items-center mb-5">
+                            <h5 class="fw-bold mb-0 text-uppercase tracking-wider">Your Cart</h5>
+                            <button class="btn btn-link text-white p-0" onclick="toggleCart()">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- Items Area (Scrollable) -->
+                        <div id="side-cart-items" class="flex-grow-1 overflow-auto">
+                            <!-- Items injected here -->
+                        </div>
+
+                       <!-- Footer / Summary -->
+                        <div class="border-top border-white-10 pt-4 bg-black">
+                            <div class="d-flex justify-content-between align-items-end mb-4 px-4">
+                                <span class="text-white-50 small">Subtotal</span>
+                                <h5 id="side-cart-total" class="fw-bold mb-0 text-accent">Rs. 0.00</h5>
+                            </div>
+                            
+                            <div class="d-grid gap-2 px-4 pb-4">
+                                <!-- Changed py-3 to py-2 for a slimmer profile -->
+                                <a href="cart.html" class="btn btn-glass-pill py-2 small text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">
+                                    View Full Cart
+                                </a>
+                                <a href="checkout.html" class="btn btn-evergreen-pill py-2 small text-uppercase fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">
+                                    Checkout Now
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Overlay for when cart is open -->
+            <div id="cart-overlay" onclick="toggleCart()"></div>
+
+                <a href="#" class="nav-icon-link">
+                    <i class="bi bi-translate fs-4"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <header class="container py-5 mt-4 text-center">
+        <h1 class="display-3 fw-800" style="letter-spacing: -2px;">Pure. Fresh. <span style="color: var(--accent);">Fast.</span></h1>
+        <p class="text-secondary opacity-75">Curated organic groceries with a minimal luxury touch.</p>
+        <div class="d-flex justify-content-center gap-2 mt-4">
+            <button class="btn btn-evergreen-pill">Shop Now</button>
+            <button class="btn btn-glass-pill" onclick="document.getElementById('collection-section').scrollIntoView({behavior: 'smooth'})">Categories</button>
+        </div>
+    </header>
+
+    <main class="container mb-5">
+        <section class="container mb-5">
+            <div class="container py-5 mt-5">
+                <hr class="luxury-divider">
+            </div>
+
+            <!-- Curated Just for You Section -->
+            <section class="product-showcase py-5">
+                <div class="container mt-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h2 class="section-headline mb-1">
+                                <i class="bi bi-stars ai-icon"></i> Curated Just for You
+                            </h2>
+                            <p class="section-subheadline mb-0">
+                                Perfectly timed picks inspired by how you shop.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Product 1: Organic Avocados -->
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <img src="https://images.unsplash.com/photo-1677555024309-19edb4a1d40e?q=80&w=327&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="product-img" alt="Avocados">
+                                </div>
+                                <div class="card-content mt-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="category-pill">Produce</span>
+                                        <span class="stock-tag">12 left</span>
+                                    </div>
+                                    <h3 class="product-title">Hass Avocados</h3>
+                                    <p class="product-desc">Ripe, creamy, and sourced from organic farms in Mexico.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="price-tag">
+                                            <span class="currency">Rs.</span>450.00
+                                        </div>
+                                        <button class="btn-add-glow" onclick="addToCart('Hass Avocados', '4.50', 'https://images.unsplash.com/photo-1677555024309-19edb4a1d40e?q=80&w=327&auto=format&fit=crop')"><i class="bi bi-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 2: Sourdough Bread -->
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <img src="https://images.unsplash.com/photo-1597604391235-a7429b4b350c?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" class="product-img" alt="Bread">
+                                </div>
+                                <div class="card-content mt-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="category-pill">Bakery</span>
+                                        <span class="stock-tag">5 left</span>
+                                    </div>
+                                    <h3 class="product-title">Artisan Sourdough</h3>
+                                    <p class="product-desc">24-hour fermented loaf with a crisp crust and airy center.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="price-tag">
+                                            <span class="currency">Rs.</span>800.00
+                                        </div>
+                                        <button class="btn-add-glow" onclick="addToCart('Artisan Sourdough', '8.00', 'https://images.unsplash.com/photo-1597604391235-a7429b4b350c?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 3: Organic Blueberries -->
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <img src="https://images.unsplash.com/photo-1497534446932-c925b458314e?q=80&w=400&auto=format&fit=crop" class="product-img" alt="Berries">
+                                </div>
+                                <div class="card-content mt-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="category-pill">Fruits</span>
+                                        <span class="stock-tag">20 left</span>
+                                    </div>
+                                    <h3 class="product-title">Wild Blueberries</h3>
+                                    <p class="product-desc">Antioxidant-rich berries, hand-picked and delivered fresh.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="price-tag">
+                                            <span class="currency">Rs.</span>625.50
+                                        </div>
+                                        <button class="btn-add-glow" onclick="addToCart('Wild Blueberries', '6.25', 'https://images.unsplash.com/photo-1497534446932-c925b458314e?q=80&w=400&auto=format&fit=crop')">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 4: Cold Brew Coffee -->
+                        <div class="col-12 col-sm-6 col-lg-3">
+                            <div class="product-card">
+                                <div class="product-image-container">
+                                    <img src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=400&auto=format&fit=crop" class="product-img" alt="Coffee">
+                                </div>
+                                <div class="card-content mt-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="category-pill">Beverages</span>
+                                        <span class="stock-tag">8 left</span>
+                                    </div>
+                                    <h3 class="product-title">Signature Cold Brew</h3>
+                                    <p class="product-desc">Slow-steeped for 18 hours. Smooth, bold, and low acidity.</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <div class="price-tag">
+                                            <span class="currency">Rs.</span>550.25
+                                        </div>
+                                        <button class="btn-add-glow" onclick="addToCart('Signature Cold Brew', '5.50', 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=400&auto=format&fit=crop')">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="container py-4">
+                <hr class="luxury-divider">
+            </div>
+
+            <!-- Daily Drop Section (Tag Removed) -->
+            <section class="daily-drop py-5">
+                <div class="container">
+                    <div class="mb-5">
+                        <h2 class="section-headline">
+                            <i class="bi bi-graph-up-arrow trending-icon"></i> The Daily Drop
+                        </h2>
+                        <p class="section-subheadline">Limited-time offers, curated for today only.</p>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-12 col-lg-6">
+                            <div class="drop-card">
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-md-5">
+                                        <div class="drop-image-wrap">
+                                            <img src="https://plus.unsplash.com/premium_photo-1695042864719-77acbe498777?q=80&w=387&auto=format&fit=crop" class="drop-img" alt="Premium Produce">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="card-body p-4">
+                                            <span class="promo-tag">Special Price</span>
+                                            <h3 class="product-title mt-2">Farm Fresh Selection</h3>
+                                            <p class="product-desc">Directly harvested from organic gardens, delivered in peak condition.</p>
+
+                                            <div class="d-flex align-items-center gap-3 mt-3">
+                                                <div class="price-tag text-accent">
+                                                    Rs.<span>120.50</span>
+                                                </div>
+                                                <div class="text-decoration-line-through opacity-50 small">
+                                                    Rs.<span>180.00</span>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-evergreen-pill btn-sm mt-3" onclick="addToCart('Farm Fresh Selection', '12.50', 'https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=400&auto=format&fit=crop')">Add to Cart</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product 2: Raw Manuka Honey -->
+                        <div class="col-12 col-lg-6">
+                            <div class="drop-card">
+                                <div class="row g-0 align-items-center">
+                                    <div class="col-md-5">
+                                        <div class="drop-image-wrap">
+                                            <img src="https://images.unsplash.com/photo-1587049352846-4a222e784d38?q=80&w=400&auto=format&fit=crop" class="drop-img" alt="Honey">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="card-body p-4">
+                                            <span class="promo-tag">Special Price</span>
+                                            <h3 class="product-title mt-2">Raw Manuka Honey</h3>
+                                            <p class="product-desc">Pure, unpasteurized honey with medicinal-grade properties.</p>
+
+                                            <div class="d-flex align-items-center gap-3 mt-3">
+                                                <div class="price-tag text-accent">
+                                                    Rs.<span>180.00</span>
+                                                </div>
+                                                <div class="text-decoration-line-through opacity-50 small">
+                                                    Rs.<span>240.50</span>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-evergreen-pill btn-sm mt-3" onclick="addToCart('Raw Manuka Honey', '18.00', 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?q=80&w=400&auto=format&fit=crop')">Add to Cart</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="container py-4">
+                <hr class="luxury-divider">
+            </div>
+
+            <section class="all-products py-5" id="collection-section">
+                <div class="container">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-5 gap-4">
+                        <div>
+                            <h2 class="section-headline">
+                                <i class="bi bi-grid-3x3-gap collection-icon"></i> The Full Collection
+                            </h2>
+                            <p class="section-subheadline mb-0">
+                                Explore every piece in our current lineup.
+                            </p>
+                        </div>
+
+                        <!-- Category Filter Bar -->
+                        <div id="category-filter-container" class="category-filter-bar">
+                            <button class="btn-filter active" onclick="filterByCategory('all')">All</button>
+                        </div>
+                    </div>
+
+                    <div id="product-list-container" class="row g-4">
+                    </div>
+
+                    <div class="text-center mt-5 pt-4">
+                        <a href="#" class="btn btn-glass-pill px-5">Back to Top</a>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </main>
+    <footer class="footer-section">
+        <div class="container">
+            <div class="row g-5">
+                <hr class="luxury-divider my-5">
+                <!-- Brand & Mission -->
+                <div class="col-lg-4 col-md-6">
+                    <a class="navbar-brand d-flex flex-column mb-3" href="#">
+                        <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
+                        <span class="tagline">Your smart grocery store</span>
+                    </a>
+                    <p class="footer-desc mt-3">
+                        Redefining grocery shopping with a touch of luxury. We deliver organic, 
+                        sustainably sourced goods directly to your door with zero compromise on quality.
+                    </p>
+                    <div class="social-links d-flex gap-3 mt-4">
+                        <a href="#"><i class="bi bi-instagram"></i></a>
+                        <a href="#"><i class="bi bi-facebook"></i></a>
+                        <a href="#"><i class="bi bi-twitter-x"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-title">Explore</h5>
+                    <ul class="footer-links list-unstyled">
+                        <li><a href="#">Shop All</a></li>
+                        <li><a href="#collection-section">Categories</a></li>
+                        <li><a href="#">Daily Drops</a></li>
+                        <li><a href="story.html">Our Story</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-title">Support</h5>
+                    <ul class="footer-links list-unstyled">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div class="col-lg-4 col-md-6">
+                    <h5 class="footer-title">Stay Fresh</h5>
+                    <p class="footer-desc">Join our newsletter for exclusive weekly drops and organic recipes.</p>
+                    <form class="newsletter-form mt-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Email Address">
+                            <button class="btn btn-evergreen-pill" type="button">Join</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <hr class="luxury-divider my-5">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center pb-5 opacity-50 small">
+                <p>© 2026 EverGreen Premium Grocery. All rights reserved.</p>
+                <div class="d-flex gap-4">
+                    <a href="#" class="text-white text-decoration-none">Privacy Policy</a>
+                    <a href="#" class="text-white text-decoration-none">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script>
+        let cart = {};
+        let allProducts = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userJson = localStorage.getItem('loggedInUser');
+            const authView = document.getElementById('authenticatedView');
+            const guestView = document.getElementById('guestView');
+            const nameDisplay = document.getElementById('userNameDisplay');
+
+            if (userJson) {
+                const user = JSON.parse(userJson);
+                if (nameDisplay && user && user.name) {
+                    nameDisplay.innerText = user.name;
+                }
+                if (authView) {
+                    authView.style.display = 'block';
+                }
+                if (guestView) {
+                    guestView.style.display = 'none';
+                }
+            } else {
+                if (authView) {
+                    authView.style.display = 'none';
+                }
+                if (guestView) {
+                    guestView.style.display = 'block';
+                }
+            }
+
+            // Fetch categories and products
+            fetchCategories();
+            fetchProducts();
+            fetchCart();
+        });
+
+        async function fetchCategories() {
+            try {
+                const response = await fetch('/api/categories');
+                const categories = await response.json();
+                renderCategories(categories);
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        }
+
+        function renderCategories(categories) {
+            const container = document.getElementById('category-filter-container');
+            // Keep the "All" button
+            container.innerHTML = `<button class="btn-filter active" onclick="filterByCategory('all')">All</button>`;
+            
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-filter';
+                btn.innerText = cat.name;
+                btn.onclick = () => filterByCategory(cat.name);
+                container.appendChild(btn);
+            });
+        }
+
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/api/products');
+                allProducts = await response.json();
+                renderProducts(allProducts);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+            }
+        }
+
+        function renderProducts(products) {
+            const container = document.getElementById('product-list-container');
+            container.innerHTML = '';
+
+            products.forEach(p => {
+                const stockText = p.stockQuantity > 0 ? `${p.stockQuantity} left` : 'Out of stock';
+                const stockClass = p.stockQuantity > 0 ? 'stock-tag' : 'stock-tag bg-danger text-white';
+                
+                container.innerHTML += `
+                    <div class="col-12 col-sm-6 col-lg-3">
+                        <div class="product-card">
+                            <div class="product-image-container">
+                                <img src="${p.imageUrl || 'https://via.placeholder.com/400x400?text=No+Image'}" class="product-img" alt="${p.name}">
+                            </div>
+                            <div class="card-content mt-3">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="category-pill">${p.category ? p.category.name : 'Uncategorized'}</span>
+                                    <span class="${stockClass}">${stockText}</span>
+                                </div>
+                                <h3 class="product-title">${p.name}</h3>
+                                <p class="product-desc">${p.description || ''}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="price-tag"><span class="currency">Rs.</span>${p.price.toFixed(2)}</div>
+                                    <button class="btn-add-glow" onclick="addToCart('${p.name}', '${p.price}', '${p.imageUrl}', ${p.id})">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterByCategory(categoryName) {
+            // Update active state of buttons
+            const buttons = document.querySelectorAll('#category-filter-container .btn-filter');
+            buttons.forEach(btn => {
+                if (btn.innerText === categoryName || (categoryName === 'all' && btn.innerText === 'All')) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            if (categoryName === 'all') {
+                renderProducts(allProducts);
+            } else {
+                const filtered = allProducts.filter(p => p.category && p.category.name === categoryName);
+                renderProducts(filtered);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html';
+        }
+
+        function toggleCart() {
+            const sidebar = document.getElementById('side-cart');
+            const overlay = document.getElementById('cart-overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        async function addToCart(name, price, image, productId) {
+            const userJson = localStorage.getItem('loggedInUser');
+            if (!userJson) {
+                alert('Please login to add items to cart');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            if (!productId) {
+                // Fallback for hardcoded items if needed, but ideally all should have IDs
+                console.error('Product ID is missing');
+                return;
+            }
+
+            const user = JSON.parse(userJson);
+            try {
+                const response = await fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        productId: productId,
+                        quantity: 1
+                    })
+                });
+
+                if (response.ok) {
+                    fetchCart(); // Refresh cart from server
+                    const sidebar = document.getElementById('side-cart');
+                    if (!sidebar.classList.contains('active')) {
+                        toggleCart();
+                    }
+                } else {
+                    alert('Failed to add item to cart');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+            }
+        }
+
+        async function fetchCart() {
+            const userJson = localStorage.getItem('loggedInUser');
+            if (!userJson) return;
+
+            const user = JSON.parse(userJson);
+            try {
+                const response = await fetch(`/api/cart/user/${user.id}`);
+                const cartItems = await response.json();
+                renderCartUI(cartItems);
+            } catch (error) {
+                console.error('Error fetching cart:', error);
+            }
+        }
+
+        function renderCartUI(cartItems) {
+            const cartItemsContainer = document.getElementById('side-cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('side-cart-total');
+
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+            let count = 0;
+
+            cartItems.forEach(item => {
+                const itemTotal = item.product.price * item.quantity;
+                total += itemTotal;
+                count += item.quantity;
+
+                cartItemsContainer.innerHTML += `
+                    <div class="d-flex align-items-center mb-3 text-white">
+                        <img src="${item.product.imageUrl || 'https://via.placeholder.com/50x50'}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                        <div class="ms-3 flex-grow-1">
+                            <div class="small fw-bold">${item.product.name}</div>
+                            <div class="small text-accent">Rs. ${(item.product.price).toFixed(2)} x ${item.quantity}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            cartCount.innerText = count;
+            cartTotal.innerText = `Rs. ${total.toFixed(2)}`;
+        }
+
+        function updateCartUI() {
+            const cartItemsContainer = document.getElementById('side-cart-items');
+            const cartCount = document.getElementById('cart-count');
+            const cartTotal = document.getElementById('side-cart-total');
+
+            cartItemsContainer.innerHTML = '';
+            let total = 0;
+            let count = 0;
+
+            for (const [name, item] of Object.entries(cart)) {
+                total += item.price * item.quantity;
+                count += item.quantity;
+
+                cartItemsContainer.innerHTML += `
+                    <div class="d-flex align-items-center mb-3 text-white">
+                        <img src="${item.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                        <div class="ms-3 flex-grow-1">
+                            <div class="small fw-bold">${name}</div>
+                            <div class="small text-accent">Rs. ${(item.price).toFixed(2)} x ${item.quantity}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            cartCount.innerText = count;
+            cartTotal.innerText = `Rs. ${total.toFixed(2)}`;
+        }
+
+        async function handleSearch() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) {
+                // If empty, show all products
+                fetchProducts();
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/products/search?q=${encodeURIComponent(query)}`);
+                const results = await response.json();
+                renderProducts(results);
+                
+                // Scroll to results
+                document.getElementById('collection-section').scrollIntoView({behavior: 'smooth'});
+            } catch (error) {
+                console.error('Error searching products:', error);
+            }
+        }
+    </script>
+    <!--Bootstrap JS Bundle-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

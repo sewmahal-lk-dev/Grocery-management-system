@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | Saved Addresses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-black text-white">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex flex-column" href="index.html">
+                <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
+            </a>
+            <div class="d-flex gap-3">
+                <a href="index.html" class="btn btn-glass-pill btn-sm">Back to Shop</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container profile-container mt-4">
+        <div class="row align-items-start">
+            
+            <!-- Reused Sidebar -->
+            <div class="col-lg-3">
+                <div class="glass-card p-4">
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar-lg mb-3">
+                            <i class="bi bi-person-circle"></i>
+                        </div>
+                        <h5 id="userNameDisplay" class="fw-bold mb-1">User Name</h5>
+                        <p id="userBioDisplay" class="small opacity-50">User Bio</p>
+                    </div>
+
+                    <div class="profile-nav d-flex flex-column gap-2">
+                        <a href="profile.html" class="nav-link-glass"><i class="bi bi-person"></i> Personal Info</a>
+                        <a href="orders.html" class="nav-link-glass"><i class="bi bi-box-seam"></i> Order History</a>
+                        <a href="addresses.html" class="nav-link-glass active"><i class="bi bi-geo-alt"></i> Saved Addresses</a>
+                        <a href="payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payment Methods</a>
+                        <hr class="luxury-divider">
+                        <a href="javascript:void(0)" onclick="logout()" class="nav-link-glass text-danger"><i class="bi bi-box-arrow-left"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold mb-0">Saved Addresses</h4>
+                    <button class="btn btn-glass-pill btn-sm" onclick="openAddModal()">
+                        <i class="bi bi-plus-lg me-2"></i>Add New Address
+                    </button>
+                </div>
+
+                <div id="addressList" class="row g-3">
+                    <!-- Addresses injected here -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card border-0">
+                <div class="modal-header border-bottom border-white-10 p-4">
+                    <h5 class="modal-title fw-bold" id="modalTitle">New Delivery Address</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="addressForm">
+                        <input type="hidden" id="addressId">
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Address Label</label>
+                            <input type="text" id="addressLabel" class="form-control glass-input" placeholder="e.g. Home, Office" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Full Name</label>
+                            <input type="text" id="fullName" class="form-control glass-input" placeholder="Receiver's Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Street Address</label>
+                            <textarea id="streetAddress" class="form-control glass-input" rows="2" placeholder="House No, Street Name, City" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50 mb-2">Phone Number</label>
+                            <input type="text" id="phone" class="form-control glass-input" placeholder="+94 ..." required>
+                        </div>
+                        <button type="submit" id="saveBtn" class="btn btn-glass-pill w-100 mt-3 py-2">
+                            Save Address
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentUser = null;
+        let addressModal = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const userJson = localStorage.getItem('loggedInUser');
+            if (userJson) {
+                currentUser = JSON.parse(userJson);
+                document.getElementById('userNameDisplay').innerText = currentUser.name;
+                document.getElementById('userBioDisplay').innerText = currentUser.bio || 'EverGreen Member';
+                fetchAddresses();
+            } else {
+                window.location.href = 'login.html';
+            }
+            addressModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+        });
+
+        async function fetchAddresses() {
+            try {
+                const response = await fetch(`/api/addresses/user/${currentUser.id}`);
+                const addresses = await response.json();
+                renderAddresses(addresses);
+            } catch (error) {
+                console.error('Error fetching addresses:', error);
+            }
+        }
+
+        function renderAddresses(addresses) {
+            const container = document.getElementById('addressList');
+            container.innerHTML = '';
+
+            if (addresses.length === 0) {
+                container.innerHTML = '<div class="col-12 text-center opacity-50 p-5">No saved addresses found.</div>';
+                return;
+            }
+
+            addresses.forEach(addr => {
+                container.innerHTML += `
+                    <div class="col-md-6">
+                        <div class="glass-card p-4 h-100 border-accent-soft">
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">${addr.label}</span>
+                                <div class="dropdown">
+                                    <button class="btn btn-link text-white p-0 opacity-50" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-dark dropdown-glass border-white-10">
+                                        <li>
+                                            <a class="dropdown-item small" href="javascript:void(0)" onclick="editAddress(${JSON.stringify(addr).replace(/"/g, '&quot;')})">
+                                                <i class="bi bi-pencil me-2"></i>Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item small text-danger" href="javascript:void(0)" onclick="deleteAddress(${addr.id})">
+                                                <i class="bi bi-trash me-2"></i>Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <h6 class="fw-bold">${addr.fullName}</h6>
+                            <p class="small text-white-50 mb-3">${addr.streetAddress}</p>
+                            <p class="small mb-0"><i class="bi bi-telephone me-2 text-accent"></i>${addr.phone}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function openAddModal() {
+            document.getElementById('addressForm').reset();
+            document.getElementById('addressId').value = '';
+            document.getElementById('modalTitle').innerText = 'New Delivery Address';
+            document.getElementById('saveBtn').innerText = 'Save Address';
+            addressModal.show();
+        }
+
+        function editAddress(addr) {
+            document.getElementById('addressId').value = addr.id;
+            document.getElementById('addressLabel').value = addr.label;
+            document.getElementById('fullName').value = addr.fullName;
+            document.getElementById('streetAddress').value = addr.streetAddress;
+            document.getElementById('phone').value = addr.phone;
+            document.getElementById('modalTitle').innerText = 'Edit Address';
+            document.getElementById('saveBtn').innerText = 'Update Address';
+            addressModal.show();
+        }
+
+        document.getElementById('addressForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('addressId').value;
+            const data = {
+                userId: currentUser.id,
+                label: document.getElementById('addressLabel').value,
+                fullName: document.getElementById('fullName').value,
+                streetAddress: document.getElementById('streetAddress').value,
+                phone: document.getElementById('phone').value
+            };
+
+            const url = id ? `/api/addresses/update/${id}` : '/api/addresses/add';
+            const method = id ? 'PUT' : 'POST';
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    addressModal.hide();
+                    fetchAddresses();
+                } else {
+                    alert('Error saving address');
+                }
+            } catch (error) {
+                console.error('Error saving address:', error);
+            }
+        });
+
+        async function deleteAddress(id) {
+            if (!confirm('Are you sure you want to delete this address?')) return;
+            try {
+                const response = await fetch(`/api/addresses/delete/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    fetchAddresses();
+                } else {
+                    alert('Error deleting address');
+                }
+            } catch (error) {
+                console.error('Error deleting address:', error);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+</html>

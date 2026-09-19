@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EverGreen | Order History</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-black text-white">
+<!-- Reusable Navbar -->
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex flex-column" href="index.html">
+            <span class="logo-text">Ever<span style="color: var(--accent);">Green</span></span>
+        </a>
+        <div class="d-flex gap-3">
+            <a href="index.html" class="btn btn-glass-pill btn-sm">Back to Shop</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container profile-container mt-4">
+    <div class="row align-items-start">
+
+        <!-- Sidebar -->
+        <div class="col-lg-3">
+            <div class="glass-card p-4">
+                <div class="text-center mb-4">
+                    <div class="profile-avatar-lg mb-3">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                    <h5 id="userNameDisplay" class="fw-bold mb-1">User Name</h5>
+                    <p id="userBioDisplay" class="small opacity-50">Member Since 2024</p>
+                </div>
+
+                <div class="profile-nav d-flex flex-column gap-2">
+                    <a href="profile.html" class="nav-link-glass"><i class="bi bi-person"></i> Personal Info</a>
+                    <a href="orders.html" class="nav-link-glass active"><i class="bi bi-box-seam"></i> Order History</a>
+                    <a href="addresses.html" class="nav-link-glass"><i class="bi bi-geo-alt"></i> Saved Addresses</a>
+                    <a href="payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payment Methods</a>
+                    <hr class="luxury-divider">
+                    <a href="javascript:void(0)" onclick="logout()" class="nav-link-glass text-danger"><i class="bi bi-box-arrow-left"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Order Content -->
+        <div class="col-lg-9">
+            <h4 class="mb-4 fw-bold">Your Orders</h4>
+
+            <div id="ordersContainer">
+                <div class="text-center p-5 opacity-50">
+                    <div class="spinner-border text-accent mb-3"></div>
+                    <p>Loading your orders...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Dynamic Invoice Modal -->
+<div class="modal fade" id="invoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0">
+            <div class="modal-header border-bottom border-white-10 p-4">
+                <h5 class="modal-title fw-bold">Order Invoice</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex justify-content-between mb-4">
+                    <div>
+                        <p class="auth-label mb-0 text-accent fw-bold">Invoice To</p>
+                        <h6 class="mb-0" id="invoiceRecipient">Recipient Name</h6>
+                        <p class="small text-white-50 mb-0" id="invoiceAddress">Street Address</p>
+                        <p class="small text-white-50" id="invoicePhone">Phone Number</p>
+                    </div>
+                    <div class="text-end">
+                        <p class="auth-label mb-0 text-accent fw-bold">Order ID</p>
+                        <h6 class="text-white" id="invoiceOrderId">#EG-0000</h6>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-dark table-sm border-0">
+                        <thead>
+                        <tr class="small opacity-50 border-bottom border-white-10">
+                            <th class="py-2">Item</th>
+                            <th class="py-2 text-center">Qty</th>
+                            <th class="py-2 text-end">Price</th>
+                        </tr>
+                        </thead>
+                        <tbody id="invoiceItemsTableBody">
+                        <!-- Dynamic order items injected here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 p-3 rounded-3" style="background: rgba(255,255,255,0.03);">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small opacity-50">Subtotal</span>
+                        <span id="invoiceSubtotal">Rs. 0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="small opacity-50">Delivery Charge</span>
+                        <span id="invoiceDelivery">Rs. 250.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 align-items-center" id="invoiceDeliveryScheduleRow" style="display: none !important;">
+                        <span class="small opacity-50">Delivery Schedule</span>
+                        <span id="invoiceDeliverySchedule" class="small text-accent text-end">Pending</span>
+                    </div>
+                    <hr class="border-white-10">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">Total Amount</span>
+                        <h4 class="fw-bold text-accent mb-0" id="invoiceTotal">Rs. 0.00</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-white-10 p-4">
+                <button id="downloadPdfBtn" class="btn btn-glass-pill w-100 py-2"><i class="bi bi-download me-2"></i>Download PDF Invoice</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Track Order Modal -->
+<div class="modal fade" id="trackOrderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content glass-card border-0">
+            <div class="modal-header border-bottom border-white-10 p-4">
+                <h5 class="modal-title fw-bold">Track Your Order</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+                    <div class="item-thumb px-3 py-2" id="trackingOrderLabel">Order #EG-0000</div>
+                    <span class="small text-accent fw-bold" id="trackingEstDelivery">Estimated Delivery: Pending</span>
+                </div>
+
+                <!-- Vertical Timeline -->
+                <div class="tracking-timeline" id="trackingTimeline">
+                    <!-- Dynamic timeline injected here -->
+                </div>
+            </div>
+            <div class="modal-footer border-top border-white-10 p-4">
+                <button class="btn btn-outline-light w-100 rounded-pill py-2" id="contactCourierBtn">Contact Courier</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    let currentUser = null;
+    let allOrders = [];
+    let invoiceModalInstance = null;
+    let trackModalInstance = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const userJson = localStorage.getItem('loggedInUser');
+        if (userJson) {
+            currentUser = JSON.parse(userJson);
+            document.getElementById('userNameDisplay').innerText = currentUser.name;
+            document.getElementById('userBioDisplay').innerText = currentUser.bio || 'EverGreen Member';
+            fetchOrders();
+        } else {
+            window.location.href = 'login.html';
+        }
+        invoiceModalInstance = new bootstrap.Modal(document.getElementById('invoiceModal'));
+        trackModalInstance = new bootstrap.Modal(document.getElementById('trackOrderModal'));
+    });
+
+    async function fetchOrders() {
+        try {
+            const response = await fetch(`/api/orders/user/${currentUser.id}`);
+            allOrders = await response.json();
+            renderOrders(allOrders);
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            document.getElementById('ordersContainer').innerHTML = '<p class="text-danger">Failed to load orders.</p>';
+        }
+    }
+
+    function renderOrders(orders) {
+        const container = document.getElementById('ordersContainer');
+        container.innerHTML = '';
+
+        if (orders.length === 0) {
+            container.innerHTML = '<div class="text-center p-5 opacity-50"><p>No orders found yet.</p></div>';
+            return;
+        }
+
+        orders.forEach(order => {
+            const date = new Date(order.orderDate).toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            container.innerHTML += `
+                <div class="glass-card p-4 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="text-white-50 small d-block">Order #EG-${order.id}</span>
+                            <span class="fw-bold">Placed on ${date}</span>
+                        </div>
+                        <span class="badge ${getStatusClass(order.status)} px-3 py-2">${order.status}</span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top border-white-10">
+                        <span class="fw-bold text-accent">Total: Rs. ${order.totalAmount.toFixed(2)}</span>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-accent btn-sm rounded-pill px-3" onclick="showInvoice(${order.id})">
+                                <i class="bi bi-file-earmark-text me-1"></i> Invoice
+                            </button>
+                            <button class="btn btn-outline-light btn-sm rounded-pill px-3" onclick="showTracking(${order.id})">
+                                <i class="bi bi-truck me-1"></i> Track
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function getStatusClass(status) {
+        switch (status) {
+            case 'PENDING': return 'bg-warning-subtle text-warning border border-warning-subtle';
+            case 'CONFIRMED': return 'bg-info-subtle text-info border border-info-subtle';
+            case 'SHIPPED': return 'bg-primary-subtle text-primary border border-primary-subtle';
+            case 'DELIVERED': return 'bg-success-subtle text-success border border-success-subtle';
+            case 'CANCELLED': return 'bg-danger-subtle text-danger border border-danger-subtle';
+            default: return 'bg-secondary-subtle text-secondary border border-secondary-subtle';
+        }
+    }
+
+    function showInvoice(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+
+        const recipient = order.shippingAddress ? order.shippingAddress.fullName : currentUser.name;
+        const streetAddress = order.shippingAddress ? order.shippingAddress.streetAddress : 'No Address Provided';
+        const phone = order.shippingAddress ? order.shippingAddress.phone : '';
+
+        document.getElementById('invoiceRecipient').innerText = recipient;
+        document.getElementById('invoiceAddress').innerText = streetAddress;
+        document.getElementById('invoicePhone').innerText = phone ? `Tel: ${phone}` : '';
+        document.getElementById('invoiceOrderId').innerText = `#EG-${order.id}`;
+
+        const tableBody = document.getElementById('invoiceItemsTableBody');
+        tableBody.innerHTML = '';
+
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const productName = item.product ? item.product.name : 'Product';
+                const itemTotal = item.price * item.quantity;
+                tableBody.innerHTML += `
+                    <tr>
+                        <td class="py-3">${productName}</td>
+                        <td class="py-3 text-center">${item.quantity}</td>
+                        <td class="py-3 text-end">Rs. ${itemTotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="3" class="text-center py-3 opacity-50">No items found</td></tr>';
+        }
+
+        const total = order.totalAmount;
+        const shipping = 250.00;
+        const subtotal = total > shipping ? total - shipping : total;
+
+        document.getElementById('invoiceSubtotal').innerText = `Rs. ${subtotal.toFixed(2)}`;
+        document.getElementById('invoiceDelivery').innerText = total > shipping ? `Rs. ${shipping.toFixed(2)}` : 'Free';
+        document.getElementById('invoiceTotal').innerText = `Rs. ${total.toFixed(2)}`;
+
+        // Render dynamic delivery scheduling details
+        const scheduleRow = document.getElementById('invoiceDeliveryScheduleRow');
+        const scheduleVal = document.getElementById('invoiceDeliverySchedule');
+
+        if (order.deliveryType === 'SCHEDULED' && order.scheduledDate) {
+            scheduleRow.style.setProperty('display', 'flex', 'important');
+            const parts = order.scheduledDate.split('-');
+            const formattedDate = new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString('en-US', {
+                month: 'long', day: 'numeric', year: 'numeric'
+            });
+            scheduleVal.innerText = `${formattedDate} (${order.scheduledTimeSlot})`;
+        } else {
+            scheduleRow.style.setProperty('display', 'none', 'important');
+        }
+
+        // Set dynamic click handler for the PDF download button
+        document.getElementById('downloadPdfBtn').onclick = () => {
+            window.location.href = `/api/orders/${order.id}/pdf`;
+        };
+
+        invoiceModalInstance.show();
+    }
+
+    function showTracking(orderId) {
+        const order = allOrders.find(o => o.id === orderId);
+        if (!order) return;
+
+        document.getElementById('trackingOrderLabel').innerText = `Order #EG-${order.id}`;
+
+        // Delivery estimate (2 days from orderDate)
+        const orderDateObj = new Date(order.orderDate);
+        const estDateObj = new Date(orderDateObj);
+        estDateObj.setDate(orderDateObj.getDate() + 2);
+        const estDateStr = estDateObj.toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+        document.getElementById('trackingEstDelivery').innerText = `Estimated Delivery: ${estDateStr}, 6:00 PM`;
+
+        const timelineContainer = document.getElementById('trackingTimeline');
+        timelineContainer.innerHTML = '';
+
+        const status = order.status;
+
+        // Generate simulated transition times for realism
+        const formatTime = (date) => date.toLocaleString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        const placedTime = formatTime(orderDateObj);
+        const confirmedTime = formatTime(new Date(orderDateObj.getTime() + 10 * 60 * 1000));
+        const shippedTime = formatTime(new Date(orderDateObj.getTime() + 3 * 60 * 60 * 1000));
+        const deliveredTime = formatTime(new Date(orderDateObj.getTime() + 24 * 60 * 60 * 1000));
+
+        let step1Class = 'completed';
+        let step2Class = '';
+        let step3Class = '';
+        let step4Class = '';
+
+        let step2Time = 'Pending';
+        let step3Time = 'Pending';
+        let step4Time = 'Pending';
+
+        if (status === 'PENDING') {
+            step1Class = 'completed active';
+        } else if (status === 'CONFIRMED') {
+            step2Class = 'completed active';
+            step2Time = confirmedTime;
+        } else if (status === 'SHIPPED') {
+            step2Class = 'completed';
+            step3Class = 'completed active';
+            step2Time = confirmedTime;
+            step3Time = shippedTime;
+        } else if (status === 'DELIVERED') {
+            step2Class = 'completed';
+            step3Class = 'completed';
+            step4Class = 'completed active';
+            step2Time = confirmedTime;
+            step3Time = shippedTime;
+            step4Time = deliveredTime;
+        } else if (status === 'CANCELLED') {
+            timelineContainer.innerHTML = `
+                <div class="glass-card p-3 border-danger-soft text-center text-danger">
+                    <i class="bi bi-x-circle-fill fs-3 mb-2 d-block"></i>
+                    <h6 class="fw-bold mb-1">Order Cancelled</h6>
+                    <p class="small text-white-50 mb-0">This order has been cancelled and cannot be tracked.</p>
+                </div>
+            `;
+            document.getElementById('contactCourierBtn').innerText = 'Contact Support';
+            document.getElementById('contactCourierBtn').disabled = false;
+            document.getElementById('contactCourierBtn').onclick = () => alert('Connecting to support...');
+            trackModalInstance.show();
+            return;
+        }
+
+        timelineContainer.innerHTML = `
+            <div class="timeline-item ${step1Class}">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h6 class="mb-0 fw-bold">Order Placed</h6>
+                    <p class="small text-white-50">${placedTime}</p>
+                </div>
+            </div>
+            <div class="timeline-item ${step2Class}">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h6 class="mb-0 fw-bold">Payment Confirmed</h6>
+                    <p class="small text-white-50">${step2Time}</p>
+                </div>
+            </div>
+            <div class="timeline-item ${step3Class}">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h6 class="mb-0 fw-bold">Out for Delivery</h6>
+                    <p class="small text-white-50">${step3Time}</p>
+                </div>
+            </div>
+            <div class="timeline-item ${step4Class}">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <h6 class="mb-0 fw-bold">Delivered</h6>
+                    <p class="small text-white-50">${step4Time}</p>
+                </div>
+            </div>
+        `;
+
+        const courierBtn = document.getElementById('contactCourierBtn');
+        if (order.courierName) {
+            courierBtn.innerText = `Contact Courier: ${order.courierName}`;
+            courierBtn.disabled = false;
+            courierBtn.onclick = () => alert(`Calling courier (${order.courierName}) at +94 77 123 4567`);
+        } else {
+            courierBtn.innerText = 'Courier Not Assigned Yet';
+            courierBtn.disabled = true;
+        }
+
+        trackModalInstance.show();
+    }
+
+    function logout() {
+        localStorage.removeItem('loggedInUser');
+        window.location.href = 'login.html';
+    }
+</script>
+</body>
+</html>

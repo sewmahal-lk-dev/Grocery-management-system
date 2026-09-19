@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Products | EverGreen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="auth-page">
+    <div class="d-flex">
+        <div class="glass-sidebar-left p-4" style="width: 280px; height: 100vh; border-right: 1px solid rgba(255,255,255,0.1);">
+            <div class="mb-5">
+                <span class="logo-text">Ever<span class="text-accent">Green</span></span>
+                <p class="tagline">Admin Suite</p>
+            </div>
+            <nav class="nav flex-column gap-2">
+                <a href="admin-dashboard.html" class="nav-link-glass"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                <a href="admin-inventory.html" class="nav-link-glass"><i class="bi bi-box-seam"></i> Inventory</a>
+                <a href="admin-products.html" class="nav-link-glass active"><i class="bi bi-journal-plus"></i> Manage Products</a>
+                <a href="admin-orders.html" class="nav-link-glass"><i class="bi bi-cart-check"></i> Orders</a>
+                <a href="admin-customers.html" class="nav-link-glass"><i class="bi bi-people"></i> Customers</a>
+                <a href="admin-logistics.html" class="nav-link-glass"><i class="bi bi-truck"></i> Logistics</a>
+                <a href="admin-payments.html" class="nav-link-glass"><i class="bi bi-credit-card"></i> Payments</a>
+                <a href="../login.html" class="nav-link-glass text-danger mt-5"><i class="bi bi-box-arrow-left"></i> Logout</a>
+            </nav>
+        </div>
+
+        <main class="flex-grow-1 p-5">
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="section-headline">Product Catalog</h2>
+                    <p class="section-subheadline">Synced with database via REST API</p>
+                </div>
+                <button type="button" id="btnAddProduct" class="btn-evergreen-pill" data-bs-toggle="modal" data-bs-target="#productModal">
+                    <i class="bi bi-plus-circle me-2"></i> Add New Product
+                </button>
+            </header>
+
+            <p id="catalogError" class="text-danger small d-none mb-3"></p>
+
+            <div class="glass-card">
+                <div class="table-responsive">
+                    <table class="table table-dark align-middle">
+                        <thead>
+                            <tr class="opacity-50 x-small text-uppercase">
+                                <th>Preview</th>
+                                <th>Product & Description</th>
+                                <th>Category</th>
+                                <th>Dates (MFD/EXP)</th>
+                                <th>Pricing</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            <tr id="productTableLoading">
+                                <td colspan="6" class="text-center py-5 text-white-50">Loading products…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="glass-card modal-content border-0 p-4">
+                <h4 id="productModalTitle" class="product-title mb-4">Add Product</h4>
+                <form id="productForm">
+                    <input type="hidden" id="editingProductId" value="">
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <label class="tagline">Image URL</label>
+                            <input type="url" id="fieldImageUrl" class="form-control auth-input mb-2" placeholder="https://…">
+                            <div class="product-img-box rounded-3 border border-white-10 overflow-hidden mx-auto" style="width: 120px; height: 120px;">
+                                <img id="imagePreview" src="" alt="" class="w-100 h-100 object-fit-cover d-none">
+                            </div>
+                            <p class="x-small opacity-50 mt-2 mb-0">Paste a hosted image URL (file upload API not included).</p>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="tagline">Product Name</label>
+                                <input type="text" id="fieldName" class="form-control auth-input" required maxlength="200" placeholder="e.g. Red Dragon Fruit">
+                            </div>
+                            <div class="mb-3">
+                                <label class="tagline">Description</label>
+                                <textarea id="fieldDescription" class="form-control auth-input" rows="3" placeholder="Short description…"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="tagline">Manufacturing Date</label>
+                            <input type="date" id="fieldMfd" class="form-control auth-input">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="tagline">Expiry Date</label>
+                            <input type="date" id="fieldExp" class="form-control auth-input text-danger">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="tagline">Category</label>
+                            <select id="fieldCategoryId" class="form-select auth-input" required>
+                                <option value="">— Select —</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="tagline">Pricing Mode</label>
+                            <select id="fieldPricingMode" class="form-select auth-input">
+                                <option value="WEIGHT_BASED_KG">Weight-Based (kg)</option>
+                                <option value="UNIT_BASED">Unit-Based</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="tagline">Base Price (LKR)</label>
+                            <input type="number" id="fieldPrice" class="form-control auth-input" required min="0" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="tagline">SKU (optional)</label>
+                            <input type="text" id="fieldSku" class="form-control auth-input" maxlength="64" placeholder="Unique stock code">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="tagline">Stock qty</label>
+                            <input type="number" id="fieldStock" class="form-control auth-input" min="0" step="1" value="0">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end pb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="fieldActive" checked>
+                                <label class="form-check-label tagline" for="fieldActive">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5 d-flex gap-3">
+                        <button type="submit" class="btn-evergreen-pill flex-grow-1">Save Product</button>
+                        <button type="button" class="btn-glass-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Client-side Guard: Only allow logged-in Admins to access this panel
+        const userJson = localStorage.getItem('loggedInUser');
+        if (!userJson) {
+            alert("Access Denied! Please sign in first.");
+            window.location.href = '../login.html';
+        } else {
+            const user = JSON.parse(userJson);
+            if (user.role !== 'ADMIN') {
+                alert("Access Denied! You do not have administrator privileges.");
+                window.location.href = '../index.html';
+            }
+        }
+
+        const API = '';
+
+        function showCatalogError(msg) {
+            const el = document.getElementById('catalogError');
+            el.textContent = msg;
+            el.classList.toggle('d-none', !msg);
+        }
+
+        function formatDate(d) {
+            if (!d) return '—';
+            if (typeof d === 'string') return d.length >= 10 ? d.slice(0, 10) : d;
+            return '—';
+        }
+
+        function priceSuffix(mode) {
+            return mode === 'UNIT_BASED' ? '/unit' : '/kg';
+        }
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
+        async function loadCategories() {
+            const sel = document.getElementById('fieldCategoryId');
+            const keepFirst = sel.querySelector('option[value=""]');
+            sel.innerHTML = '';
+            sel.appendChild(keepFirst);
+            const res = await fetch(API + '/api/categories');
+            if (!res.ok) throw new Error('Failed to load categories');
+            const list = await res.json();
+            list.forEach(c => {
+                const o = document.createElement('option');
+                o.value = c.id;
+                o.textContent = c.name;
+                sel.appendChild(o);
+            });
+        }
+
+        async function loadProducts() {
+            showCatalogError('');
+            const tbody = document.getElementById('productTableBody');
+            try {
+                const res = await fetch(API + '/api/products');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const products = await res.json();
+                tbody.innerHTML = '';
+                if (products.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-white-50">No products yet. Add one above.</td></tr>';
+                    return;
+                }
+                products.forEach(p => {
+                    const catName = p.category ? p.category.name : '—';
+                    const m = formatDate(p.manufacturingDate);
+                    const e = formatDate(p.expiryDate);
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div class="product-img-box rounded-3 border border-white-10 overflow-hidden" style="width: 60px; height: 60px;">
+                                ${p.imageUrl ? `<img src="${escapeHtml(p.imageUrl)}" alt="" class="w-100 h-100 object-fit-cover">` : '<div class="d-flex align-items-center justify-content-center h-100 text-white-50" style="font-size:0.65rem;">—</div>'}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="fw-bold">${escapeHtml(p.name)}</div>
+                            <div class="x-small opacity-50 text-truncate" style="max-width: 240px;">${escapeHtml(p.description || '')}</div>
+                        </td>
+                        <td><span class="category-pill">${escapeHtml(catName)}</span></td>
+                        <td>
+                            <div class="x-small">M: <span class="text-white">${escapeHtml(m)}</span></div>
+                            <div class="x-small">E: <span class="text-danger">${escapeHtml(e)}</span></div>
+                        </td>
+                        <td><span class="fw-bold">Rs. ${Number(p.price).toFixed(2)}</span> <span class="x-small opacity-50">${priceSuffix(p.pricingMode)}</span></td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn-add-cart btn-edit" data-id="${p.id}" title="Edit"><i class="bi bi-pencil"></i></button>
+                                <button type="button" class="btn-add-cart text-danger btn-delete" data-id="${p.id}" title="Delete"><i class="bi bi-trash"></i></button>
+                            </div>
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+                tbody.querySelectorAll('.btn-edit').forEach(btn => {
+                    btn.addEventListener('click', () => openEdit(Number(btn.getAttribute('data-id'))));
+                });
+                tbody.querySelectorAll('.btn-delete').forEach(btn => {
+                    btn.addEventListener('click', () => deleteProduct(Number(btn.getAttribute('data-id'))));
+                });
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-5 text-danger">Could not load products. Is the server running?</td></tr>';
+                showCatalogError(err.message || String(err));
+            }
+        }
+
+        const productModalEl = document.getElementById('productModal');
+        const productModal = new bootstrap.Modal(productModalEl);
+
+        function resetProductForm() {
+            document.getElementById('editingProductId').value = '';
+            document.getElementById('productModalTitle').textContent = 'Add Product';
+            document.getElementById('productForm').reset();
+            document.getElementById('fieldActive').checked = true;
+            document.getElementById('fieldPricingMode').value = 'WEIGHT_BASED_KG';
+            document.getElementById('imagePreview').classList.add('d-none');
+            document.getElementById('imagePreview').removeAttribute('src');
+        }
+
+        document.getElementById('btnAddProduct').addEventListener('click', () => {
+            resetProductForm();
+        });
+
+        document.getElementById('fieldImageUrl').addEventListener('input', () => {
+            const url = document.getElementById('fieldImageUrl').value.trim();
+            const img = document.getElementById('imagePreview');
+            if (url) {
+                img.src = url;
+                img.classList.remove('d-none');
+            } else {
+                img.classList.add('d-none');
+                img.removeAttribute('src');
+            }
+        });
+
+        async function openEdit(id) {
+            showCatalogError('');
+            try {
+                const res = await fetch(API + '/api/products/' + id);
+                if (!res.ok) throw new Error('Not found');
+                const p = await res.json();
+                document.getElementById('editingProductId').value = String(p.id);
+                document.getElementById('productModalTitle').textContent = 'Edit Product';
+                document.getElementById('fieldName').value = p.name || '';
+                document.getElementById('fieldDescription').value = p.description || '';
+                document.getElementById('fieldImageUrl').value = p.imageUrl || '';
+                document.getElementById('fieldMfd').value = formatDate(p.manufacturingDate) === '—' ? '' : formatDate(p.manufacturingDate);
+                document.getElementById('fieldExp').value = formatDate(p.expiryDate) === '—' ? '' : formatDate(p.expiryDate);
+                document.getElementById('fieldCategoryId').value = p.category ? String(p.category.id) : '';
+                document.getElementById('fieldPricingMode').value = p.pricingMode || 'WEIGHT_BASED_KG';
+                document.getElementById('fieldPrice').value = p.price != null ? p.price : '';
+                document.getElementById('fieldSku').value = p.sku || '';
+                document.getElementById('fieldStock').value = p.stockQuantity != null ? p.stockQuantity : 0;
+                document.getElementById('fieldActive').checked = p.active !== false;
+                document.getElementById('fieldImageUrl').dispatchEvent(new Event('input'));
+                productModal.show();
+            } catch (e) {
+                alert('Could not load product: ' + e.message);
+            }
+        }
+
+        function buildPayload() {
+            const skuVal = document.getElementById('fieldSku').value.trim();
+            const imgVal = document.getElementById('fieldImageUrl').value.trim();
+            const mfd = document.getElementById('fieldMfd').value;
+            const exp = document.getElementById('fieldExp').value;
+            return {
+                name: document.getElementById('fieldName').value.trim(),
+                description: document.getElementById('fieldDescription').value.trim() || null,
+                price: parseFloat(document.getElementById('fieldPrice').value),
+                sku: skuVal || null,
+                stockQuantity: parseInt(document.getElementById('fieldStock').value, 10) || 0,
+                active: document.getElementById('fieldActive').checked,
+                imageUrl: imgVal || null,
+                manufacturingDate: mfd || null,
+                expiryDate: exp || null,
+                pricingMode: document.getElementById('fieldPricingMode').value,
+                categoryId: parseInt(document.getElementById('fieldCategoryId').value, 10)
+            };
+        }
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const idStr = document.getElementById('editingProductId').value;
+            const payload = buildPayload();
+            if (!payload.categoryId) {
+                alert('Please select a category.');
+                return;
+            }
+            if (Number.isNaN(payload.price)) {
+                alert('Please enter a valid price.');
+                return;
+            }
+            const isEdit = idStr !== '';
+            const url = isEdit ? (API + '/api/admin/products/' + idStr) : (API + '/api/admin/products');
+            const method = isEdit ? 'PUT' : 'POST';
+            try {
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!res.ok) {
+                    const t = await res.text();
+                    throw new Error(t || res.statusText);
+                }
+                productModal.hide();
+                resetProductForm();
+                await loadProducts();
+            } catch (err) {
+                alert('Save failed: ' + err.message);
+            }
+        });
+
+        async function deleteProduct(id) {
+            if (!confirm('Delete this product permanently?')) return;
+            try {
+                const res = await fetch(API + '/api/admin/products/' + id, { method: 'DELETE' });
+                if (!res.ok && res.status !== 204) {
+                    const t = await res.text();
+                    throw new Error(t || res.statusText);
+                }
+                await loadProducts();
+            } catch (err) {
+                alert('Delete failed: ' + err.message);
+            }
+        }
+
+        (async function init() {
+            try {
+                await loadCategories();
+                await loadProducts();
+            } catch (e) {
+                showCatalogError(e.message || String(e));
+                document.getElementById('productTableBody').innerHTML =
+                    '<tr><td colspan="6" class="text-center py-5 text-danger">Failed to load catalog.</td></tr>';
+            }
+        })();
+    </script>
+</body>
+</html>
